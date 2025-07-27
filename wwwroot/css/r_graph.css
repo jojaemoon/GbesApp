@@ -1,0 +1,142 @@
+
+.data_list {
+    margin: 50px auto;
+    width: 95%;
+}
+
+.delet_area {
+    width: 100%;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+}
+
+.delet {
+    border-radius: 5px;
+    border: 1px solid #bbbbbb;
+    width: 120px;
+    font-size: 16px;
+    height: 50px;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #111;
+}
+
+.delet_icon {
+    border-radius: 50px;
+    height: 18px;
+    width: 18px;
+    border: 2px solid #dc0000;
+    color: #dc0000;
+    line-height: 15px;
+    margin: 0 auto;
+}
+
+.table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: center;
+}
+
+.table tr {}
+
+.table th {
+    background: #eef4ff;
+    padding: 20px 10px;
+    word-break: break-all
+}
+
+.table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid #ccc;
+    word-break: break-all
+}
+
+.table td a {
+    text-decoration: underline;
+}
+
+.table td a:hover {
+    color: #0075bf
+}
+
+@media screen and (max-width:768px) {
+
+    /*block*/
+    .table--block thead {
+        display: none;
+    }
+
+    .table--block tr {
+        display: block;
+        margin-bottom: 10px;
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .table--block th,
+    .table--block td {
+        display: block;
+        position: relative;
+        padding: 10px 0;
+        padding-left: 50%;
+        border-width: 0 0 1px 0;
+    }
+
+    .table--block td:before {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 50%;
+        padding: 10px 0;
+        background: #eef4ff;
+    }
+
+    .table--block td:nth-child(1):before {
+        content: '순번';
+    }
+
+    .table--block td:nth-child(2):before {
+        content: '종목';
+    }
+
+    .table--block td:nth-child(3):before {
+        content: '종별';
+    }
+
+    .table--block td:nth-child(4):before {
+        content: '이름';
+    }
+
+    .table--block td:nth-child(5):before {
+        content: '생년월일';
+    }
+
+    .table--block td:nth-child(6):before {
+        content: '소속';
+    }
+
+    .table--block td:nth-child(7):before {
+        content: '학년';
+    }
+
+    .table--block td:nth-child(8):before {
+        content: '세부종목';
+    }
+
+    .table--block td:nth-child(9):before {
+        content: '지도교사';
+    }
+
+    .table--block td:nth-child(10):before {
+        content: '비고';
+    }
+
+    .table--block td:nth-child(11):before {
+        content: '수정';
+    }
+}

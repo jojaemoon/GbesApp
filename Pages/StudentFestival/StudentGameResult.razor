@@ -1,0 +1,753 @@
+﻿@page "/StudentGameResult"
+
+<div class="menu_title subimg3">
+    <h3>경상북도학생체육대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/StudentIntro">대회일정</a></li>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/StudentPartyEntry">참가신청</a></li>
+        }
+        <li class="on"><a href="/StudentCityInwon">참가현황</a></li>
+        <li><a href="/StudentGameResult">경기결과</a></li>
+        <li><a href="/StudentJonghapResult">육상성적</a></li>
+        @if (memberPart == "경기단체" || memberPart == "교육지원청" || memberPart == "경북교육청" || memberName == "관리자")
+        {
+            <li><a href="/StudentGameOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberName == "관리자")
+        {
+            <li><a href="/StudentGamePartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+<div id="search">
+    <div class="wrap">
+        <h2>@year 경북학생체육대회 경기 결과</h2>
+        <div class="filter">
+            <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+            <select value="@gName" @onchange="SelectGameName">
+                <option>종목선택</option>
+                @foreach (var item in gNameList)
+                {
+                    <option>@item</option>
+                }
+            </select>
+            <select value="@sName" @onchange="SelectSectionName">
+                <option>종별선택</option>
+                @foreach (var item in sNameList)
+                {
+                    <option>@item</option>
+                }
+            </select>
+            <select value="@dName" @onchange="SelectDetailName">
+                <option>세부종목선택</option>
+                @foreach (var item in dNameList)
+                {
+                    <option>@item</option>
+                }
+            </select>
+            @if (gName == "육상")
+            {
+                <span style="margin-left: 10px;"><strong>@detailPartyInwon.ToString()</strong>명 참가</span>
+                <span style="margin-left: 10px;">득점 합: <strong>@jumsuHap.ToString()</strong>점</span>
+            }
+            <div class="line"></div>
+            @if (isShowMember)
+            {
+                <button class="plus showOrHideClass" @onclick="RankPlayerAdd">
+                    <div>추가</div>
+                    <div>+</div>
+                </button>
+            }
+            @if (memberName == "경북교육청" || memberName == "관리자")
+            {
+                <button class="excel" @onclick="DwonLoadGameResult">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            }
+        </div>
+    </div>
+
+    <div class="data_list">
+        <div>
+            <table class="table table--block" cellspacing="0" cellpadding="0">
+
+                <thead>
+                    <tr>
+                        @if (memberName == "경북교육청" || memberName == "관리자")
+                        {
+                            <th>종목</th>
+                            <th>종별</th>
+                            <th>세부종목</th>
+                        }
+                        <th>순위</th>
+                        <th>시군</th>
+                        <th>이름</th>
+                        <th>학교명</th>
+                        <th>학년</th>
+                        <th>기록</th>
+                        <th>비고</th>
+                        @if (gName == "육상")
+                        {
+                            <th>득점</th>
+                        }
+                        @*<th>지도교사</th>*@
+                        @if (isShowMember)
+                        {
+                            <th class="" style="width:7%"></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in listGameResult)
+                    {
+                        <tr>
+                            @if (memberName == "경북교육청" || memberName == "관리자")
+                            {
+                                <td>@item.gName</td>
+                                <td>@item.sName</td>
+                                <td>@item.dName</td>
+                            }
+                            <td>@item.rank</td>
+                            <td>@item.city</td>
+                            <td>@item.name</td>
+                            <td>@item.school</td>
+                            <td>@SchoolYearDisplay(item.schoolYear)</td>
+                            <td>@item.record</td>
+                            <td>@item.etc</td>
+                            @if (gName == "육상")
+                            {
+                                <td>@item.specialOne</td>
+                            }
+                            @if (isShowMember)
+                            {
+                                <td class="">
+                                    <button class="edit" @onclick="(()=>RecordEdit(item))">수정</button>
+                                    <button class="delete" @onclick="(()=>DeleteModel(item))">삭제</button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+                @if (isEdit)
+                {
+                    <tfoot>
+                        <tr>
+                            @if (memberName == "경북교육청" || memberName == "관리자")
+                            {
+                                <td>@model.gName</td>
+                                <td>@model.sName</td>
+                                <td>@model.dName</td>
+                            }
+                            <td><input type="text" class="inputRank" @bind="model.rank" placeholder="순위" /></td>
+                            <td>
+                                <select @bind="tfootSelectCity" class="ddlCity">
+                                    @* disabled="@isDisabledCity" *@
+                                    <option>시/군</option>
+                                    @foreach (var item in cNameList)
+                                    {
+                                        <option>@item</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <select value="@onePlayer" @onchange="OnePlayer_Changed" class="ddlName">
+                                    <option></option>
+                                    @foreach (var item in playerList)
+                                    {
+                                        <option>@item</option>
+                                    }
+                                    @* @if (playerList.Count == 1)
+                                    {
+                                        <option selected>@playerList.FirstOrDefault()</option>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in playerList)
+                                        {
+                                            <option>@item</option>
+                                        }
+                                    } *@
+
+                                </select>
+                                @if(detailInwon>1)
+                                {
+                                    <br />
+                                    <select value="@twoPlayer" @onchange="TwoPlayer_Changed" class="ddlName">
+                                        <option></option>
+                                        @foreach (var item in playerList)
+                                        {
+                                            <option>@item</option>
+                                        }
+                                    </select>
+                                }
+                                @if (detailInwon >2)
+                                {
+                                    <br />
+                                    <select value="@threePlayer" @onchange="ThreePlayer_Changed" class="ddlName">
+                                        <option></option>
+                                        @foreach (var item in playerList)
+                                        {
+                                            <option>@item</option>
+                                        }
+                                    </select>
+                                }
+                                @if (detailInwon >3)
+                                {
+                                    <br />
+                                    <select value="@fourPlayer" @onchange="FourPlayer_Changed" class="ddlName">
+                                        <option></option>
+                                        @foreach (var item in playerList)
+                                        {
+                                            <option>@item</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                            <td><input type="text" class="inputSchoolName" @bind="model.school" placeholder="학교명" /></td>
+                            <td><input type="text" class="inputSchoolYear" @bind="model.schoolYear" placeholder="학년" /></td>
+                            <td><input type="text" class="inputRecord" @bind="model.record" placeholder="기록" /></td>
+                            <td><input type="text" class="inputEtc" @bind="model.etc" placeholder="신기록(구분,종전기록) 비고" /></td>
+                            <td>@model.specialOne</td>
+                            <td class="">
+                                <div style="padding-top 20px;">
+                                    <button class="save" @onclick="SaveModel">저장</button>
+                                    <button class="cancel" @onclick="CancelModel">취소</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                    
+                }
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .menu_title {
+        text-align: center;
+        color: #fff;
+        background-color: #0075bf;
+        width: 100%;
+        height: 250px;
+        margin-top: 100px;
+    }
+
+        .menu_title h3 {
+            line-height: 250px;
+        }
+
+    .sub_menu {
+        height: 50px;
+        line-height: 50px;
+        border-bottom: 1px solid #b8b8b8;
+    }
+
+        .sub_menu ul {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 95%;
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+            .sub_menu ul li {
+                line-height: 50px;
+            }
+
+        .sub_menu .on {
+            color: #0075bf;
+            border-bottom: 2px solid #0075bf;
+        }
+
+        .sub_menu ul li:hover {
+            color: #0075bf;
+            border-bottom: 2px solid #0075bf;
+        }
+
+    #search .wrap {
+        width: 95%;
+        max-width: 1240px;
+        margin: 50px auto;
+        text-align: center;
+    }
+
+    .filter {
+        display: flex;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+        width: 100%;
+        padding: 20px 50px;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+        .filter select {
+            border-radius: 50px;
+            background-color: #fff;
+            flex: 1;
+            height: 50px;
+            padding: 10px;
+            background-image: url(../imgs/sub/select_arrow.png);
+            background-position: right 24px center;
+            background-repeat: no-repeat;
+        }
+
+        .filter button {
+            border-radius: 5px;
+            width: 180px;
+            font-size: 16px;
+            height: 50px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter .plus {
+            background-color: #0075bf;
+            color: #fff;
+        }
+
+        .filter .excel {
+            background-color: #fff;
+            color: #111;
+        }
+
+        .filter .line {
+            border-left: 1px solid #9b9b9b;
+        }
+
+    .modal_list select {
+        border-radius: 50px;
+        background-color: #fff;
+        flex: 1;
+        width: 200px;
+        height: 40px;
+        padding: 10px;
+        background-image: url(../imgs/sub/select_arrow.png);
+        background-position: right 24px center;
+        background-repeat: no-repeat;
+    }
+
+    @@media screen and (max-width: 900px) {
+        .filter {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .filter button {
+                width: 100%;
+            }
+    }
+
+    .data_list {
+        margin: 50px auto;
+        width: 95%;
+    }
+
+    .delet_area {
+        width: 100%;
+        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 30px;
+    }
+
+    .delet {
+        border-radius: 5px;
+        border: 1px solid #bbbbbb;
+        width: 120px;
+        font-size: 16px;
+        height: 50px;
+        padding: 0 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #111;
+    }
+
+    .delet_icon {
+        border-radius: 50px;
+        height: 18px;
+        width: 18px;
+        border: 2px solid #dc0000;
+        color: #dc0000;
+        line-height: 15px;
+        margin: 0 auto;
+    }
+
+    .table {
+        table-layout: fixed;
+        width: 100%;
+        text-align: center;
+    }
+
+        .table tr {
+        }
+
+        .table th {
+            background: #eef4ff;
+            padding: 20px 10px;
+            word-break: break-all
+        }
+
+        .table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #ccc;
+            word-break: break-all
+        }
+
+            .table td a {
+                text-decoration: underline;
+            }
+
+                .table td a:hover {
+                    color: #0075bf
+                }
+
+    @@media screen and (max-width:768px) {
+        /*block*/
+        .table--block thead {
+            display: none;
+        }
+
+        .table--block tr {
+            display: block;
+            margin-bottom: 10px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .table--block th,
+        .table--block td {
+            display: block;
+            position: relative;
+            padding: 10px 0;
+            padding-left: 50%;
+            border-width: 0 0 1px 0;
+        }
+
+            .table--block td:before {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 50%;
+                padding: 10px 0;
+                background: #eef4ff;
+            }
+
+            .table--block td:nth-child(1):before {
+                content: '순위';
+            }
+
+            .table--block td:nth-child(2):before {
+                content: '시군';
+            }
+
+            .table--block td:nth-child(3):before {
+                content: '이름';
+            }
+
+            .table--block td:nth-child(4):before {
+                content: '소속';
+            }
+
+            .table--block td:nth-child(5):before {
+                content: '학년';
+            }
+
+            .table--block td:nth-child(6):before {
+                content: '기록';
+            }
+
+            .table--block td:nth-child(7):before {
+                content: '비고';
+            }
+
+            .table--block td:nth-child(8):before {
+                content: '득점';
+            }
+    }
+
+    /* 모달 스타일 */
+    /*모달버튼*/
+    .modal-content {
+        width: 100%;
+        top: 0;
+    }
+
+    .modal-custom {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 9999;
+        cursor: pointer;
+        display: none;
+        text-align: center;
+    }
+
+    .modal-window {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        z-index: 9999;
+        width: 95%;
+        max-width: 700px;
+    }
+
+    .close-modal {
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close-modal img {
+            margin-bottom: 20px
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    .close-area {
+        cursor: pointer;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-wrap {
+        margin-top: 20px;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 100);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 10px;
+        max-width: 700px;
+        width: 95%;
+        padding: 50px 30px;
+        margin: 0 auto;
+        max-height: calc(100vh - 100px);
+        overflow: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal_list {
+        width: 100%;
+        display: flex;
+        font-size: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        text-align: left;
+        gap: 10px;
+    }
+
+
+        .modal_list .type {
+            width: 45%;
+            padding-bottom: 15px;
+        }
+
+        .modal_list .full {
+            width: 100%;
+        }
+
+
+        .modal_list .type .title {
+            font-weight: 600;
+        }
+
+        .modal_list .type .data {
+            margin-top: 10px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 400;
+            /* border-bottom: 1px solid #333; */
+        }
+
+    .btn_wrap {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+        .btn_wrap button {
+            border-radius: 5px;
+            width: 180px;
+            color: #fff;
+            width: 40%;
+            height: 50px;
+        }
+
+    .cancel {
+        background-color: #666;
+        color: #fff
+    }
+
+    .edit {
+        background-color: #0075bf;
+        color: #fff
+    }
+
+    .delete {
+        background-color: red;
+        color: #fff
+    }
+</style>
+
+<style>
+    input {
+        font-size: 18px;
+        color: #222222;
+        width: 250px;
+        border: 1px solid black;
+        padding: 3px;
+        height: 40px;
+        /*border-bottom: solid #aaaaaa 1px; */
+        /* padding-bottom: 10px;
+                    padding-left: 10px; */
+        /* position: relative; */
+        background: none;
+        z-index: 5;
+    }
+
+        input::placeholder {
+            color: #aaaaaa;
+            font-size: 12px;
+        }
+
+    /* input:focus {
+                outline: none;
+            }
+
+            input:focus, .modal_list input:valid {
+                font-size: 16px;
+                bottom: 40px;
+                color: #666;
+                font-weight: bold;
+            }
+
+            input:focus, .modal_list input:valid {
+                width: 100%;
+            }*/
+    .ddlCity, .ddlName {
+        width: 100px;
+        border-radius: 50px;
+        border: 1px solid black;
+        height: 50px;
+        padding: 10px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .inputRank {
+        width: 70px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .inputName {
+        width: 120px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .inputSchoolName {
+        width: 200px;
+    }
+
+    .inputSchoolYear {
+        width: 70px;
+        text-align: center;
+    }
+
+    .inputRecord {
+        width: 100px;
+    }
+
+    .inputEtc {
+        width: 150px;
+    }
+
+    .inputRank:focus {
+        width: 70px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputName:focus {
+        width: 120px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputSchoolName:focus {
+        width: 200px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputSchoolYear:focus {
+        width: 70px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputRecord:focus {
+        width: 100px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputEtc:focus {
+        width: 150px;
+    }
+
+    .edit {
+        color: white;
+        background: #7fccde;
+        padding: 5px;
+        border-radius: 12px;
+    }
+    .delete {
+        color: white;
+        background: #cb99c5;
+        margin-left: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .save {
+        color: white;
+        background: #fa5a5a;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .cancel {
+        color: white;
+        background: #f0d264;
+        margin-left: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+    
+</style>

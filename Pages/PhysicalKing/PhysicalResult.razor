@@ -1,0 +1,433 @@
+﻿@page "/PhysicalResult"
+
+<div class="menu_title subimg3">
+    <h3>경상북도 체력인증제</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        <li><a href="/MemberFirst">로그인정보</a></li>
+        <li><a href="/PhysicalIntro">대회요강</a></li>
+        <li><a href="/PhysicalPartyEntry">참가신청</a></li>
+        <li><a href="/PhysicalPartyInwon">참가현황</a></li>
+        <li class="on"><a href="/PhysicalResult">측정결과</a></li>
+    </ul>
+</div>
+
+<div id="search">
+    <div class="wrap">
+        <h2>2025 경상북도 체력인증제 결과</h2>
+        <div class="filter">
+            <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+            <select value="@cName" @onchange="SelectCityName">
+                <option>시군선택</option>
+                <option>전체</option>
+                @foreach (var item in cNameList)
+                {
+                    <option>@item</option>
+                }
+            </select>
+            @if (memberName == "경북교육청" || memberName == "관리자")
+            {
+                <input type="" class="inputPass" @bind="initializePassword" placeholder="비밀번호" />
+                <button class="btn btn-danger" @onclick="MakeResultInitialize">결과초기화</button>
+                <button id="excelDown" class="excel" @onclick="DownLoadPartyEntry">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            }
+            else
+            {
+                <span>종별 순위는 시군선택에서 "전체" 선택 후 종별을 클릭 하세요</span>
+            }
+        </div>
+        <div class="text-center">
+            <div id="button-container" class="btn-group">
+                <button class="btn btn-primary" @onclick='(()=>SectionClick("남자초등부"))'>남자초등부</button>
+                <button class="btn btn-success" @onclick='(()=>SectionClick("여자초등부"))'>여자초등부</button>
+                <button class="btn btn-primary" @onclick='(()=>SectionClick("남자중학부"))'>남자중학부</button>
+                <button class="btn btn-success" @onclick='(()=>SectionClick("여자중학부"))'>여자중학부</button>
+                <button class="btn btn-primary" @onclick='(()=>SectionClick("남자고등부"))'>남자고등부</button>
+                <button class="btn btn-success" @onclick='(()=>SectionClick("여자고등부"))'>여자고등부</button>
+            </div>
+        </div>
+    </div>
+
+    @if ((memberName == "경북교육청" || memberName == "관리자") && cName != "전체")
+    {
+        <div class="data_list">
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        @if (memberName == "경북교육청" || memberName == "관리자")
+                        {
+                            <tr id="trSample">
+                                <td colspan="6" style="text-align: right;">입력예시</td>
+                                <td>32.0 (kg.g)</td>
+                                <td>202.0 (cm.mm)</td>
+                                <td>15.0 (cm.mm)</td>
+                                <td>9.00 (초.1/100)</td>
+                                <td>2.00 (분.초)</td>
+                                <td colspan="3">점수 나와야 됨</td>
+                            </tr>
+                        }
+                        <tr>
+                            <th>넘버</th>
+                            <th>이름</th>
+                            <th>학교명</th>    @*  줄일것 *@
+                            <th>학년</th>
+                            <th>성별</th>
+                            <th>구분</th>
+                            <th>악력</th>
+                            <th>제자리멀리뛰기</th>
+                            <th>윗몸앞으로굽히기</th>
+                            <th>50m 달리기</th>
+                            <th>순환운동</th>
+                            <th>합계</th>
+                            <th>순위</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+                        @foreach (var item in listGameResult)
+                        {
+                            i++;
+                            <tr>
+                                <td class="tdNumbering" rowspan="2">@item.numbering</td>
+                                <td class="tdPlayer" rowspan="2">@item.name</td>
+                                <td class="tdSchoolname" rowspan="2">@item.schoolName</td>
+                                <td class="tdSchoolYear" rowspan="2">@item.schoolYear</td>
+                                <td class="tdSchoolYear" rowspan="2">@item.code</td>
+                                <td class="tdRecord tdBottom">기록</td>
+                                <td class="tdBottom">
+                                    <input type="text" class="inputRecord" value="@item.gripRecord" @onchange="((ChangeEventArgs args)=>GripInput(args, item))">
+                                </td>
+                                <td class="tdBottom">
+                                    <input type="text" class="inputRecord" value="@item.jumpRecord" @onchange="((ChangeEventArgs args)=>JumpInput(args, item))">
+                                </td>
+                                <td class="tdBottom">
+                                    <input type="text" class="inputRecord" value="@item.bendRecord" @onchange="((ChangeEventArgs args)=>BendInput(args, item))">
+                                </td>
+                                <td class="tdBottom">
+                                    <input type="text" class="inputRecord" value="@item.run50mRecord" @onchange="((ChangeEventArgs args)=>Run50mInput(args, item))">
+                                </td>
+                                <td class="tdBottom">
+                                    <input type="text" class="inputRecord" value="@item.movementRecord" @onchange="((ChangeEventArgs args)=>MovementInput(args, item))">
+                                </td>
+                                <td class="tdJumsu" rowspan="2">
+                                    @IsZeroToBlank(item.jumsuHap)
+                                </td>
+                                <td class="tdRank" rowspan="2">
+                                    @(item.jumsuHap == 0 ? "" : item.rank)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tdJumsu">점수</td>
+                                <td class="tdJumsu">
+                                    @item.gripJumsu @* @IsZeroToBlank(item.gripJumsu) *@
+                                </td>
+                                <td class="tdJumsu">
+                                    @item.jumpJumsu  @* @IsZeroToBlank(item.jumpJumsu) *@
+                                </td>
+                                <td class="tdJumsu">
+                                    @item.bendJumsu  @* @IsZeroToBlank(item.bendJumsu) *@
+                                </td>
+                                <td class="tdJumsu">
+                                    @item.run50mJumsu  @*   @IsZeroToBlank(item.run50mJumsu) *@
+                                </td>
+                                <td class="tdJumsu">
+                                    @item.movementJumsu @* @IsZeroToBlank(item.movementJumsu) *@
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" @onclick="(()=>Save(item))">저장</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="data_list">
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>넘버</th>
+                            <th>이름</th>
+                            <th>학교명</th>    @*  줄일것 *@
+                            <th>학년</th>
+                            <th>구분</th>
+                            <th>악력</th>
+                            <th>제자리멀리뛰기</th>
+                            <th>윗몸앞으로굽히기</th>
+                            <th>50m 달리기</th>
+                            <th>순환운동</th>
+                            <th>합계</th>
+                            <th>순위</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+                        @foreach (var item in listGameResult)
+                        {
+                            i++;
+                            <tr>
+                                @if (item.rank < 11)
+                                {
+                                    <td class="tdNumbering" rowspan="2">@item.numbering</td>
+                                    <td class="tdPlayer" rowspan="2">@item.name</td>
+                                    <td class="tdSchoolname" rowspan="2">@item.schoolName</td>
+                                    <td class="tdSchoolYear" rowspan="2">@item.schoolYear</td>
+                                }
+                                else
+                                {
+                                    <td class="tdNumbering" rowspan="2">@(item.numbering.Substring(0, 1))**</td>
+                                    <td class="tdPlayer" rowspan="2">@(item.name.Substring(0, 1))**)</td>
+                                    <td class="tdSchoolname" rowspan="2">@(item.schoolName.Substring(0, 1))*******</td>
+                                    <td class="tdSchoolYear" rowspan="2">@item.schoolYear</td>
+                                }
+                                <td class="tdBottom">기록</td>
+                                <td class="tdBottom">
+                                    @item.gripRecord
+                                    @if (!string.IsNullOrEmpty(item.gripRecord))
+                                    {
+                                        <span>kg</span>
+                                    }
+                                </td>
+                                <td class="tdBottom">
+                                    @item.jumpRecord
+                                    @if (!string.IsNullOrEmpty(item.jumpRecord))
+                                    {
+                                        <span>cm</span>
+                                    }
+                                </td>
+                                <td class="tdBottom">
+                                    @item.bendRecord
+                                    @if (!string.IsNullOrEmpty(item.bendRecord))
+                                    {
+                                        <span>cm</span>
+                                    }
+                                </td>
+                                <td class="tdBottom">
+                                    @ReplaceSec(item.run50mRecord)
+                                </td>
+                                <td class="tdBottom">
+                                    @ReplaceMinSec(item.movementRecord)
+                                </td>
+                                <td class="tdJumsu" rowspan="2">
+                                    @IsZeroToBlank(item.jumsuHap)
+                                </td>
+                                <td class="tdRank" rowspan="2">
+                                    @(item.jumsuHap == 0 ? "" : item.rank)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>점수</td>
+                                <td class="tdJumsu">
+                                    @IsZeroToBlank(item.gripJumsu)
+                                </td>
+                                <td class="tdJumsu">
+                                    @IsZeroToBlank(item.jumpJumsu)
+                                </td>
+                                <td class="tdJumsu">
+                                    @IsZeroToBlank(item.bendJumsu)
+                                </td>
+                                <td class="tdJumsu">
+                                    @IsZeroToBlank(item.run50mJumsu)
+                                </td>
+                                <td class="tdJumsu">
+                                    @IsZeroToBlank(item.movementJumsu)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>
+
+<style>
+    input {
+        font-size: 18px;
+        color: #222222;
+        width: 250px;
+        border: 1px solid black;
+        padding: 3px;
+        height: 40px;
+        /*border-bottom: solid #aaaaaa 1px; */
+        /* padding-bottom: 10px;
+                                                        padding-left: 10px; */
+        /* position: relative; */
+        background: none;
+        z-index: 5;
+    }
+
+        input::placeholder {
+            color: #aaaaaa;
+            font-size: 12px;
+        }
+
+    /* input:focus {
+                                                    outline: none;
+                                                }
+
+                                                input:focus, .modal_list input:valid {
+                                                    font-size: 16px;
+                                                    bottom: 40px;
+                                                    color: #666;
+                                                    font-weight: bold;
+                                                }
+
+                                                input:focus, .modal_list input:valid {
+                                                    width: 100%;
+                                                }*/
+    .ddlCity, .ddlName {
+        width: 100px;
+        border-radius: 50px;
+        border: 1px solid black;
+        height: 50px;
+        padding: 10px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .inputRank {
+        width: 70px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .inputName {
+        width: 120px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .inputSchoolName {
+        width: 200px;
+    }
+
+    .inputSchoolYear {
+        width: 70px;
+        text-align: center;
+    }
+
+    .inputRecord {
+        width: 100px;
+        text-align: center;
+    }
+
+        .inputRecord:focus {
+            width: 100px;
+        }
+
+    .inputEtc {
+        width: 150px;
+    }
+
+    .inputRank:focus {
+        width: 70px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputName:focus {
+        width: 120px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputSchoolName:focus {
+        width: 200px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputSchoolYear:focus {
+        width: 70px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputRecord:focus {
+        width: 100px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputEtc:focus {
+        width: 150px;
+    }
+
+    .edit {
+        color: white;
+        background: #7fccde;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .delete {
+        color: white;
+        background: #cb99c5;
+        margin-left: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .save {
+        color: white;
+        background: #fa5a5a;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .cancel {
+        color: white;
+        background: #f0d264;
+        margin-left: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .inputPass {
+        width: 200px;
+    }
+
+        .inputPass:focus {
+            width: 200px;
+            border: 2px solid blue;
+            background-color: beige;
+        }
+
+    .tdJumsu {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: blue;
+    }
+
+    .tdJumsu, .tdRank {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: red;
+    }
+
+    .table tr td {
+        vertical-align: middle;
+    }
+
+    #trSample td {
+        color: blue;
+        /* font-weight: bold; */
+    }
+
+    table > tbody > tr > td.tdBottom {
+        border-bottom: 1px solid #f2f2f2;
+    }
+</style>

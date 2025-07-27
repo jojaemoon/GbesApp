@@ -1,0 +1,32 @@
+﻿@layout EmptyLayout
+
+@page "/StudentPartyEntry_Print/{partyName}/{city}/{gName}/{sName}"
+
+<body onload="setTimeout(function () { window.print(); }, 1000);
+    window.onafterprint = function(){ window.close(); };" style="text-align: center;">
+
+    <div>
+        <h1>@partyName</h1>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <td colspan="4">참가신청서</td>
+            </tr>
+            <tr>
+                <td>@city</td>
+                <td>@gName</td>
+                <td>@sName</td>
+                <td>@city</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+</body>

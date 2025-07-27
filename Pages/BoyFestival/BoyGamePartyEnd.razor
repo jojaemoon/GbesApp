@@ -1,0 +1,79 @@
+﻿@page "/BoyGamePartyEnd"
+
+<div class="menu_title subimg3">
+    <h3>경상북도학생체육대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/BoyIntro" class="dropdown-item">대회요강</a></li>
+        <li><a href="/BoyPartyEntry" class="dropdown-item">참가신청</a></li>
+        <li><a href="/BoyCityInwon" class="dropdown-item">참가현황</a></li>
+        <li><a href="/BoyGameResult" class="dropdown-item">경기결과</a></li>
+       @*  <li><a href="/BoySelection" class="dropdown-item">선발현황</a></li> *@
+        @if (memberPart == "경기단체" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/BoyGameOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/BoyGamePartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+<div id="search">
+    <div class="wrap">
+        <h2>@year 경북소년체육대회 마감처리 </h2>
+        <div class="filter">
+
+        </div>
+    </div>
+
+    <div class="data_list">
+        <div>
+            <table class="table table--block" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th style="width:7%">순</th>
+                        <th>종목</th>
+                        <th>대회명</th>
+                        <th>마감여부</th>
+                        <th>비고</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 0;
+                    }
+
+                    @foreach (var item in events)
+                    {
+                        i++;
+                        <tr>
+                            <td>@i</td>
+                            <td>@item.gName</td>
+                            <td>@item.specialTwo</td>
+                            <td>
+                                @if (item.specialThree == "사용" || item.specialThree == "")
+                                {
+                                    <button type="button" class="btn btn-success" @onclick="(()=>BtnClick(item))">@item.specialThree</button>
+                                }
+                                else if (item.specialThree == "마감")
+                                {
+                                    <button type="button" class="btn btn-warning" @onclick="(()=>BtnClick(item))">@item.specialThree</button>
+                                }
+                            </td>
+                            <td>@item.etc</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>

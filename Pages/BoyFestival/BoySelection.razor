@@ -1,0 +1,43 @@
+﻿@page "/BoySelection"
+
+<div class="menu_title subimg3">
+    <h3>경상북도소년체육대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/BoyIntro" class="dropdown-item">대회요강</a></li>
+        <li><a href="/BoyPartyEntry" class="dropdown-item">참가신청</a></li>
+        <li><a href="/BoyCityInwon" class="dropdown-item">참가현황</a></li>
+        <li><a href="/BoyGameResult" class="dropdown-item">경기결과</a></li>
+        @* <li><a href="/BoySelection" class="dropdown-item">선발현황</a></li> *@
+        @if (memberPart == "경기단체" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/BoyGameOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/BoyGamePartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+<div id="search">
+    <div class="wrap">
+        <h3>전국소년체육대회 선발자 명단</h3>
+        <br />
+        <img src="/imgs/contentready.png" width="400" />
+    </div>
+
+
+</div>
+
+
+
+
+@code {
+
+}

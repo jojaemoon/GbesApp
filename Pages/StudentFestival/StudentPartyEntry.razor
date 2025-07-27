@@ -1,0 +1,375 @@
+﻿@page "/StudentPartyEntry"
+
+<div class="menu_title subimg3">
+    <h3>경상북도학생체육대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/StudentIntro">대회일정</a></li>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/StudentPartyEntry">참가신청</a></li>
+        }
+        <li class="on"><a href="/StudentCityInwon">참가현황</a></li>
+        <li><a href="/StudentGameResult">경기결과</a></li>
+        <li><a href="/StudentJonghapResult">육상성적</a></li>
+        @if (memberPart == "경기단체" || memberPart == "교육지원청" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/StudentGameOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/StudentGamePartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+@if (!isMember)
+{
+    <h2>로그인 후 사용 가능 합니다.....</h2>
+}
+else
+{
+    <div id="search">
+        <div class="wrap">
+            <h2>@year 경북학생체육대회 참가선수 목록 <span class="red">결과 @listPartyEntry.Count<span>명</span></span></h2>
+            <div class="filter">
+                <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+                <select value="@cName" @onchange="SelectCity" disabled="@isDisabledCity">
+                    <option>시/군</option>
+                    @foreach (var item in cNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <select value="@gName" @onchange="SelectGameName">
+                    <option>종목선택</option>
+                    @foreach (var item in gNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <select value="@sName" @onchange="SelectSectionName">
+                    <option>종별선택</option>
+                    @foreach (var item in sNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <div class="line"></div>
+                @if (showOrHideClass == "showCSS")
+                {
+                    @if (isGameUsing)
+                    {
+                        <button id="addPlayer" class="plus" @onclick="ModalOpenNewPlayer">
+                            <div>선수추가</div>
+                            <div>+</div>
+                        </button>
+                    }
+                }
+                <button id="excelDown" class="excel" @onclick="DownLoadPartyEntry">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            </div>
+        </div>
+
+        <div class="data_list">
+            @* <div class="delet_area">
+        <button class="delet">
+        <div>선택 삭제</div>
+        <div class="delet_icon">-</div>
+        </button>
+        </div> *@
+
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            @* <th style="width:7%">선택</th> *@
+                            <th style="width:7%">순번</th>
+                            <th>종목</th>
+                            <th>종별</th>
+                            <th>이름</th>
+                            <th>생년월일</th>
+                            <th>소속</th>
+                            <th style="width:7%">학년</th>
+                            <th style="width:15%">세부종목</th>
+                            <th style="width:7%">지도교사</th>
+                            <th>비고</th>
+                            <th>학폭확인서</th>
+                            <th>학교장확인서</th>
+                            <th>입학확인서</th>
+                            @if (isGameUsing)
+                            {
+                                <th class="@showOrHideClass" style="width:7%"></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+
+                        @foreach (var item in listPartyEntry)
+                        {
+                            i++;
+                            <tr>
+                                @* <td><input type="checkbox"></td> *@
+                                <td>@i</td>
+                                <td>@item.gName</td>
+                                <td>@item.sName</td>
+                                <td><a href="javascript:openModal('modal1');" class="modal-custom-button" @onclick="(()=>ModalEdit(item))">@item.name</a></td>
+                                <td>@item.jumin</td>
+                                <td>@item.schoolName</td>
+                                <td>@item.schoolYear</td>
+                                <td>@DetailNames(item)</td>
+                                <td>@item.special</td>
+                                <td>@item.etc</td>
+                                <td>
+                                    <a href="" @onclick="(()=>OneDownLoad(item.specialOne))" @onclick:preventDefault>@IsFile(item.specialOne)</a>
+                                </td>
+                                <td>
+                                    <a href="" @onclick="(()=>OneDownLoad(item.specialTwo))" @onclick:preventDefault>@IsFile(item.specialTwo)</a>
+                                </td>
+                                <td>
+                                    <a href="" @onclick="(()=>OneDownLoad(item.specialThree))" @onclick:preventDefault>@IsFile(item.specialThree)</a>
+                                </td>
+                                @if (isGameUsing)
+                                {
+                                    <td class="@showOrHideClass">
+                                        <a href="javascript:openModal('modal1');" class="modal-custom-button" @onclick="(()=>ModalEdit(item))">수정</a>
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+<!--모달창-->
+<div class="modal-custom modal-content modal1">
+    <div class="modal-window">
+        <a href="javascript:closeModal('modal-custom');">
+            <span class="close-modal"><img src="../imgs/sub/close.png"></span>
+        </a>
+        <div class="modal-wrap">
+            <div class="modal_list">
+                <div class="type">
+                    <div class="title">시군</div>
+                    <div class="data">
+                        <select @bind="modalSelectCity">
+                            @* disabled="@isDisabledCity" *@
+                            <option>시군선택</option>
+                            @foreach (var item in cNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">학교명</div>
+                    <div class="data">
+                        <select @bind="modalSelectSchool">
+                            @* disabled="@isDisabledSchool" *@
+                            <option>학교선택</option>
+                            @foreach (var item in schoolNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">종목</div>
+                    <div class="data">
+                        <select @bind="modalSelectGame">
+                            <option>종목선택</option>
+                            @foreach (var item in gNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">종별</div>
+                    <div class="data">
+                        <select @bind="modalSelectSection">
+                            <option>종별선택</option>
+                            @foreach (var item in sNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">이름</div>
+                    <div class="data">
+                        <input type="text" @bind="model.name" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">생년월일</div>
+                    <div class="data">
+                        <input type="text" @bind="model.jumin" placeholder="주민번호앞자리" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">소속</div>
+                    <div class="data">
+                        <input type="text" @bind="model.schoolName" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">학년</div>
+                    <div class="data">
+                        <input type="text" @bind="model.schoolYear" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">세부종목 1</div>
+                    <div class="data">
+                        <select @bind="selectDetailOne" required>
+                            <option>선택</option>
+                            @foreach (var item in dNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    @if (isSelectTwo)
+                    {
+                        <div class="title">세부종목 2</div>
+                        <div class="data">
+                            <select @bind="selectDetailTwo">
+                                <option></option>
+                                @foreach (var item in dNameList)
+                                {
+                                    <option>@item</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                </div>
+                <div class="type">
+                    @if (isSelectThree)
+                    {
+                        <div class="title">세부종목 3</div>
+                        <div class="data">
+                            <select @bind="selectDetailThree">
+                                <option></option>
+                                @foreach (var item in dNameList)
+                                {
+                                    <option>@item</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                </div>
+                <div class="type">
+                    @if (isSelectFour)
+                    {
+                        <div class="title">세부종목 4</div>
+                        <div class="data">
+                            <select @bind="selectDetailFour">
+                                <option></option>
+                                @foreach (var item in dNameList)
+                                {
+                                    <option>@item</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                </div>
+                <div class="type">
+                    <div class="title">지도교사</div>
+                    <div class="data">
+                        <input type="text" @bind="model.special" />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">비고</div>
+                    <div class="data">
+                        <input type="text" @bind="model.etc" />
+                    </div>
+                </div>
+                @if (memberName.Contains("체육"))
+                {
+                    <div class="type">
+                        <div class="title">비고</div>
+                        <div class="data">
+                            <input type="text" @bind="model.photo" placeholder="출신시군입력" />
+                        </div>
+                    </div>
+                }
+
+                <ul id="down">
+                    <li>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="inputPassword6" class="col-form-label">학폭확인서 : <span class="fileInfo">@IsFile(model.specialOne)</span></label>
+                            </div>
+                            <div class="col-md-7"><InputFile @key=@(inputFileId) multiple OnChange="OnChangeOne" class="form-control" /></div>
+                            <div class="col-md-2"><button class="btn btn-primary" @onclick="OnSubmitOne">파일올리기</button></div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="inputPassword6" class="col-form-label">학교장확인서 : <span class="fileInfo">@IsFile(model.specialTwo)</span></label>
+                            </div>
+                            <div class="col-md-7"><InputFile @key=@(inputFileId) multiple OnChange="OnChangeTwo" class="form-control" /></div>
+                            <div class="col-md-2"><button class="btn btn-primary" @onclick="OnSubmitTwo">파일올리기</button></div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="inputPassword6" class="col-form-label">입학확인서 : <span class="fileInfo">@IsFile(model.specialThree)</span></label>
+                            </div>
+                            <div class="col-md-7"><InputFile @key=@(inputFileId) multiple OnChange="OnChangeThree" class="form-control" /></div>
+                            <div class="col-md-2"><button class="btn btn-primary" @onclick="OnSubmitThree">파일올리기</button></div>
+                        </div>
+                    </li>
+                    <li>파일명에 특수문자 및 띄어쓰기 없는 파일만 저장됩니다.<br /> (학폭1, 학교장1, 입학1)</li>
+                </ul>
+
+            </div>
+            <div class="btn_wrap">
+                <button class="edit" @onclick="SaveModel">저장</button>
+                @if (isEdit)
+                {
+                    <button class="delete" @onclick="DeleteModel">삭제</button>
+                }
+                <button class="cancel" @onclick="CancelModel">작성취소</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    #addPlayer:hover {
+        background-color: lightseagreen;
+    }
+
+    #excelDown:hover {
+        background-color: yellow;
+    }
+
+    .fileInfo {
+        color: blue;
+        font-size: 0.9em;
+    }
+</style>

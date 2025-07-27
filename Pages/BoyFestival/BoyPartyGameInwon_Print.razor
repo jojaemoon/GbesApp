@@ -1,0 +1,87 @@
+﻿@layout BlankLayout
+
+@page "/BoyPartyGameInwon_Print/{memberID:int}"
+
+<body onload="setTimeout(function () { window.print(); }, 1000);
+    window.onafterprint = function(){ window.close(); };" style="text-align: center;">
+    <div id="printId" style="padding-left: 20px;padding-right: 20px;">
+        <div id="search">
+            <div class="data_list">
+                <div style="text-align: center; font-size: 24px; padding-top: 40px;">선수단 인원 총괄표</div>
+                <div style="text-align: right; padding-bottom: 20px;">@memberName<span>교육장 (직인)</span></div>
+                <div>
+                    <table id="tblInwon" class="" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="text-align: center;">순</th>
+                                <th rowspan="2" style="text-align: center;">종목</th>
+                                <th colspan="3" style="text-align: center;">초등부</th>
+                                <th colspan="3" style="text-align: center;">중학부</th>
+                                <th rowspan="2" style="text-align: center;">선수계</th>
+                                <th rowspan="2" style="text-align: center;">임원수</th>
+                                <th rowspan="2" style="text-align: center;">합계</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: center;">남</th>
+                                <th style="text-align: center;">여</th>
+                                <th style="text-align: center;">계</th>
+                                <th style="text-align: center;">남</th>
+                                <th style="text-align: center;">여</th>
+                                <th style="text-align: center;">계</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in listInwon)
+                            {
+                                <tr>
+                                    <td style="width: 60px;text-align: center;">@item.no</td>
+                                    <td style="width: 200px;text-align: center;">@item.gName</td>
+                                    <td style="width: 100px;text-align: center;">@(item.primaryMan == 0 ? "" : item.primaryMan)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.primaryWoman == 0 ? "" : item.primaryWoman)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.primaryHap == 0 ? "" : item.primaryHap)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.middleMan == 0 ? "" : item.middleMan)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.middleWoman == 0 ? "" : item.middleWoman)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.middleHap == 0 ? "" : item.middleHap)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.playerHap == 0 ? "" : item.playerHap)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.officer == 0 ? "" : item.officer)</td>
+                                    <td style="width: 100px;text-align: center;">@(item.totalHap == 0 ? "" : item.totalHap)</td>
+                                </tr>
+                            }
+                            <tr class="trFooter">
+                                <td colspan="2" style="text-align: center;">계</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.primaryMan) == 0 ? "" : listInwon.Sum(it => it.primaryMan))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.primaryWoman) == 0 ? "" : listInwon.Sum(it => it.primaryWoman))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.primaryHap) == 0 ? "" : listInwon.Sum(it => it.primaryHap))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.middleMan) == 0 ? "" : listInwon.Sum(it => it.middleMan))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.middleWoman) == 0 ? "" : listInwon.Sum(it => it.middleWoman))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.middleHap) == 0 ? "" : listInwon.Sum(it => it.middleHap))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.playerHap) == 0 ? "" : listInwon.Sum(it => it.playerHap))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.officer) == 0 ? "" : listInwon.Sum(it => it.officer))</td>
+                                <td style="text-align: center;">@(listInwon.Sum(it => it.totalHap) == 0 ? "" : listInwon.Sum(it => it.totalHap))</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<style>
+    @@media print {
+        /* size: 210mm 297mm; /*A4*/  margin: 0mm; padding: 0mm;
+        
+    }
+
+    #tblInwon td {
+        border: 1px solid black;
+        height: 22px;
+    }
+
+    #tblInwon th {
+        border: 1px solid black;
+        height: 24px;
+    }
+</style>
+

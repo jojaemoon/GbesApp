@@ -1,0 +1,97 @@
+﻿@page "/YearTrackPartyEnd"
+
+<div class="menu_title subimg3">
+    <h3>@year 경상북도교육감배 초·중학년별 육상경기대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/YearTrackIntro">대회요강</a></li>
+        <li><a href="/YearTrackPartyEntry" style="font-weight: bold;">참가신청</a></li>
+        <li><a href="/YearTrackCityInwon">참가현황1</a></li>
+        <li><a href="/YearTrackCityInwonTotal">참가현황2</a></li>
+        <li><a href="/YearTrackGameResult">경기결과</a></li>
+        <li><a href="/YearTracktJonghapResult">육상성적</a></li>
+        @if (memberPart == "경기단체" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/YearTrackOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/YearTrackPartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+@if (memberPart != "경북교육청" && memberPart != "관리자")
+{
+    <h2>도교육청에서 사용 합니다.....  <a id="login" href="/login" class="btn bg-main text-w">로그인</a> </h2>
+
+}
+else
+{
+    <div id="search">
+        <div class="wrap">
+            <h2>경상북도교육감배 초·중학년별 육상경기대회 참가신청 마감처리</h2>
+            <div class="inline-container">
+                <div class="row" style="width: 300px;">
+                    <div class="col-md-4">
+                        <input type="checkbox" checked="@isUse" @onchange="OnUseChanged" id="chkUse" />
+                        <label for="chkUse" class="checkbox-label">사용</label>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="checkbox" checked="@isEnb" @onchange="OnEndChanged" id="chkEnd" style="margin-left: 28px;" />
+                        <label for="chkEnd" class="checkbox-label">마감</label>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="save-btn" @onclick="Save">저장</button>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .inline-container {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        background: #f6f8fa;
+        padding: 18px 32px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(100, 100, 100, 0.06);
+        font-family: 'Noto Sans KR', 'Segoe UI', Arial, sans-serif;
+        font-size: 1.1rem;
+    }
+
+    .checkbox-label {
+        margin-right: 8px;
+        margin-left: 4px;
+    }
+
+    .save-btn {
+        margin-left: 36px;
+        padding: 8px 28px;
+        background: #2d72d9;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .save-btn:hover {
+            background: #1b4e94;
+        }
+
+    .result-text {
+        margin-top: 18px;
+        font-size: 1rem;
+        color: #333;
+    }
+</style>

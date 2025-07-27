@@ -1,0 +1,553 @@
+﻿@page "/StudentJongHapCityByul"
+
+@* @layout EmptyLayout *@
+
+<div class="menu_title subimg3">
+    <h3>경상북도학생체육대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/StudentIntro">대회일정</a></li>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/StudentPartyEntry">참가신청</a></li>
+        }
+        <li class="on"><a href="/StudentCityInwon">참가현황</a></li>
+        <li><a href="/StudentGameResult">경기결과</a></li>
+        <li><a href="/StudentJonghapResult">육상성적</a></li>
+        @if (memberPart == "경기단체" || memberPart == "교육지원청" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/StudentGameOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/StudentGamePartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+<div id="search">
+    <div class="wrap">
+        <h2>2023 경북학생체육대회 육상성적</h2>
+        <div class="filter">
+            <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+            <select value="@sName" @onchange="SelectSection">
+                <option>종별</option>
+                @foreach (var item in partList)
+                {
+                    <option>@item</option>
+                }
+            </select>
+            <select value="@cName" @onchange="SelectCity">
+                <option>시/군</option>
+                @foreach (var item in cityArr)
+                {
+                    <option>@item</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    @if (sName != "육상종합")
+    {
+        <div class="data_list">
+            <table class="table table--block tablePT" cellspacing="0" cellpadding="0">
+                <caption>
+                    <h3>
+                        경상북도 학생체육대회 시군별 종합득점표<br />
+                        @sName
+                    </h3>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>시군</th>
+                        <th>부별</th>
+                        <th>종목</th>
+                        <th>득점</th>
+                        <th>순위</th>
+                        <th>부별점수</th>
+                        <th>비고</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in listJonghap)
+                    {
+                        <tr>
+                            <td>@item.city</td>
+                            <td>@item.sName</td>
+                            <td>@item.gName</td>
+                            <td>@item.dukjum</td>
+                            <td class="rank">@item.rank</td>
+                            <td>@item.jumsu</td>
+                            <td>@item.etc</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="data_list">
+            <table class="table table--block tablePT" cellspacing="0" cellpadding="0">
+                <caption>
+                    <h3>
+                        경상북도 학생체육대회 시군별 종합득점표<br />
+                        @sName
+                    </h3>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>시군</th>
+                        <th>순위</th>
+                        <th>득점</th>
+                        <th>비고</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in listJonghap)
+                    {
+                        <tr>
+                            <td>@item.city</td>
+                            <td class="rank">@item.rank</td>
+                            <td>@item.dukjum</td>
+                            <td>@item.etc</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
+<style>
+    .menu_title {
+        text-align: center;
+        color: #fff;
+        background-color: #0075bf;
+        width: 100%;
+        height: 250px;
+        margin-top: 100px;
+    }
+
+        .menu_title h3 {
+            line-height: 250px;
+        }
+
+    .sub_menu {
+        height: 50px;
+        line-height: 50px;
+        border-bottom: 1px solid #b8b8b8;
+    }
+
+        .sub_menu ul {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 95%;
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+            .sub_menu ul li {
+                line-height: 50px;
+            }
+
+        .sub_menu .on {
+            color: #0075bf;
+            border-bottom: 2px solid #0075bf;
+        }
+
+        .sub_menu ul li:hover {
+            color: #0075bf;
+            border-bottom: 2px solid #0075bf;
+        }
+
+    #search .wrap {
+        width: 95%;
+        max-width: 1240px;
+        margin: 50px auto;
+        text-align: center;
+    }
+
+    .filter {
+        display: flex;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+        width: 100%;
+        padding: 20px 50px;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+        .filter select {
+            border-radius: 50px;
+            background-color: #fff;
+            flex: 1;
+            height: 50px;
+            padding: 10px;
+            background-image: url(../imgs/sub/select_arrow.png);
+            background-position: right 24px center;
+            background-repeat: no-repeat;
+        }
+
+        .filter button {
+            border-radius: 5px;
+            width: 180px;
+            font-size: 16px;
+            height: 50px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter .plus {
+            background-color: #0075bf;
+            color: #fff;
+        }
+
+        .filter .excel {
+            background-color: #fff;
+            color: #111;
+        }
+
+        .filter .line {
+            border-left: 1px solid #9b9b9b;
+        }
+
+    .modal_list select {
+        border-radius: 50px;
+        background-color: #fff;
+        flex: 1;
+        width: 200px;
+        height: 40px;
+        padding: 10px;
+        background-image: url(../imgs/sub/select_arrow.png);
+        background-position: right 24px center;
+        background-repeat: no-repeat;
+    }
+
+    @@media screen and (max-width: 900px) {
+        .filter {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .filter button {
+                width: 100%;
+            }
+    }
+
+    .data_list {
+        margin: 50px auto;
+        width: 95%;
+    }
+
+    .delet_area {
+        width: 100%;
+        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 30px;
+    }
+
+    .delet {
+        border-radius: 5px;
+        border: 1px solid #bbbbbb;
+        width: 120px;
+        font-size: 16px;
+        height: 50px;
+        padding: 0 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #111;
+    }
+
+    .delet_icon {
+        border-radius: 50px;
+        height: 18px;
+        width: 18px;
+        border: 2px solid #dc0000;
+        color: #dc0000;
+        line-height: 15px;
+        margin: 0 auto;
+    }
+
+    .table {
+        table-layout: fixed;
+        width: 100%;
+        text-align: center;
+    }
+
+        .table tr {
+        }
+
+        .table th {
+            background: #eef4ff;
+            padding: 20px 10px;
+            word-break: break-all
+        }
+
+        .table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #ccc;
+            word-break: break-all
+        }
+
+            .table td a {
+                text-decoration: underline;
+            }
+
+                .table td a:hover {
+                    color: #0075bf
+                }
+
+    @@media screen and (max-width:768px) {
+        /*block*/
+        .table--block thead {
+            display: none;
+        }
+
+        .table--block tr {
+            display: block;
+            margin-bottom: 10px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .table--block th,
+        .table--block td {
+            display: block;
+            position: relative;
+            padding: 10px 0;
+            padding-left: 50%;
+            border-width: 0 0 1px 0;
+        }
+
+            .table--block td:before {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 50%;
+                padding: 10px 0;
+                background: #eef4ff;
+            }
+
+            .table--block td:nth-child(1):before {
+                content: '시군';
+            }
+
+            .table--block td:nth-child(2):before {
+                content: '부별';
+            }
+
+            .table--block td:nth-child(3):before {
+                content: '종목';
+            }
+
+            .table--block td:nth-child(4):before {
+                content: '득점';
+            }
+
+            .table--block td:nth-child(5):before {
+                content: '순위';
+            }
+
+            .table--block td:nth-child(6):before {
+                content: '부별점수';
+            }
+
+            .table--block td:nth-child(7):before {
+                content: '비고';
+            }
+    }
+
+    /* 모달 스타일 */
+    /*모달버튼*/
+    .modal-content {
+        width: 100%;
+        top: 0;
+    }
+
+    .modal-custom {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 9999;
+        cursor: pointer;
+        display: none;
+        text-align: center;
+    }
+
+    .modal-window {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        z-index: 9999;
+        width: 95%;
+        max-width: 700px;
+    }
+
+    .close-modal {
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close-modal img {
+            margin-bottom: 20px
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    .close-area {
+        cursor: pointer;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-wrap {
+        margin-top: 20px;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 100);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 10px;
+        max-width: 700px;
+        width: 95%;
+        padding: 50px 30px;
+        margin: 0 auto;
+        max-height: calc(100vh - 100px);
+        overflow: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal_list {
+        width: 100%;
+        display: flex;
+        font-size: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        text-align: left;
+        gap: 10px;
+    }
+
+
+        .modal_list .type {
+            width: 45%;
+            padding-bottom: 15px;
+        }
+
+        .modal_list .full {
+            width: 100%;
+        }
+
+
+        .modal_list .type .title {
+            font-weight: 600;
+        }
+
+        .modal_list .type .data {
+            margin-top: 10px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 400;
+            /* border-bottom: 1px solid #333; */
+        }
+
+    .btn_wrap {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+        .btn_wrap button {
+            border-radius: 5px;
+            width: 180px;
+            color: #fff;
+            width: 40%;
+            height: 50px;
+        }
+
+    .cancel {
+        background-color: #666;
+        color: #fff
+    }
+
+    .edit {
+        background-color: #0075bf;
+        color: #fff
+    }
+
+    .delete {
+        background-color: red;
+        color: #fff
+    }
+</style>
+<style>
+    .thDetail {
+        line-height: 200%;
+    }
+
+    .tdCity {
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+
+    .tdRank, .tdRanksu {
+        font-size: 0.9em;
+        color: red;
+    }
+
+    .tdJumsu {
+        font-weight: bold;
+    }
+
+    .tdDuckjum {
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+
+    .tdSectionRank {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: red;
+    }
+
+    .tdSectionJumsu {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: blue;
+    }
+
+    .tdEtc {
+        font-size: 0.9em;
+    }
+
+    .table tr:last-child td {
+        font-weight: bold;
+    }
+
+    .red {
+        color: red;
+    }
+</style>
+
+

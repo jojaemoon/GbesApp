@@ -1,0 +1,627 @@
+﻿@page "/YearTrackCityInwonTotal"
+
+<div class="menu_title subimg3">
+    <h3>@year 경상북도교육감배 초·중학년별 육상경기대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/YearTrackIntro">대회요강</a></li>
+        <li><a href="/YearTrackPartyEntry" style="font-weight: bold;">참가신청</a></li>
+        <li><a href="/YearTrackCityInwon">참가현황1</a></li>
+        <li><a href="/YearTrackCityInwonTotal">참가현황2</a></li>
+        <li><a href="/YearTrackGameResult">경기결과</a></li>
+        <li><a href="/YearTracktJonghapResult">육상성적</a></li>
+        @if (memberPart == "경기단체" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/YearTrackOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/YearTrackPartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+
+<div id="search">
+    <div class="data_list">
+        <div>
+            <h3>
+                경상북도교육감배 초·중학년별 육상경기대회
+
+                @memberName &nbsp;&nbsp;&nbsp;
+                @* <button type="button" class="btn btn-primary" @onclick="PrintComponent">인쇄</button> *@
+                <button type="button" class="btn btn-primary" @onclick="PrintTable">인쇄</button>
+                <br />
+            </h3>
+        </div>
+        <div>
+            <table class="table table-striped table--block" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th rowspan="2">연번</th>
+                        <th rowspan="2" class="name">시군</th>
+                        <th colspan="3">초등부</th>
+                        <th colspan="3">중학부</th>
+                        <th rowspan="2">선수수</th>
+                        <th rowspan="2">임원수</th>
+                        <th rowspan="2">총합계</th>
+                    </tr>
+                    <tr>
+                        <th>남</th>
+                        <th>여</th>
+                        <th>계</th>
+                        <th>남</th>
+                        <th>여</th>
+                        <th>계</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="total">
+                        <td class="name" colspan="2">합 계</td>
+                        <td class="hap">@(listInwon.Sum(it => it.primaryManHap) == 0 ? "" : listInwon.Sum(it => it.primaryManHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.primaryWomanHap) == 0 ? "" : listInwon.Sum(it => it.primaryWomanHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.primaryHap) == 0 ? "" : listInwon.Sum(it => it.primaryHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.middleManHap) == 0 ? "" : listInwon.Sum(it => it.middleManHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.middleWomanHap) == 0 ? "" : listInwon.Sum(it => it.middleWomanHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.middleHap) == 0 ? "" : listInwon.Sum(it => it.middleHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.playerHap) == 0 ? "" : listInwon.Sum(it => it.playerHap))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.officer) == 0 ? "" : listInwon.Sum(it => it.officer))</td>
+                        <td class="hap">@(listInwon.Sum(it => it.totalHap) == 0 ? "" : listInwon.Sum(it => it.totalHap))</td>
+                    </tr>
+                    @foreach (var item in listInwon)
+                    {
+                        <tr>
+                            <td>@item.no</td>
+                            <td class="name">@NameSplit(item.name)</td>
+                            <td class="hap">@(item.primaryManHap == 0 ? "" : item.primaryManHap)</td>
+                            <td class="hap">@(item.primaryWomanHap == 0 ? "" : item.primaryWomanHap)</td>
+                            <td class="hap">@(item.primaryHap == 0 ? "" : item.primaryHap)</td>
+                            <td class="hap">@(item.middleManHap == 0 ? "" : item.middleManHap)</td>
+                            <td class="hap">@(item.middleWomanHap == 0 ? "" : item.middleWomanHap)</td>
+                            <td class="hap">@(item.middleHap == 0 ? "" : item.middleHap)</td>
+                            <td class="hap">@(item.playerHap == 0 ? "" : item.playerHap)</td>
+                            <td class="hap">@(item.officer == 0 ? "" : item.officer)</td>
+                            <td class="hap">@(item.totalHap == 0 ? "" : item.totalHap)</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="printId" style="padding-left: 30px;padding-right: 30px; display: none;">
+    <div id="search">
+        <div class="data_list">
+            <div style="text-align: center; font-size: 24px; padding-top: 40px;">선수단 인원 총괄표</div>
+            <div style="text-align: right; padding-bottom: 10px;">@memberName<span>교육장 (직인)</span></div>
+            <div>
+                <table class="table table-striped table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">연번</th>
+                            <th rowspan="2" class="name">시군</th>
+                            <th colspan="3">초등부</th>
+                            <th colspan="3">중학부</th>
+                            <th rowspan="2">선수수</th>
+                            <th rowspan="2">임원수</th>
+                            <th rowspan="2">총합계</th>
+                        </tr>
+                        <tr>
+                            <th>남</th>
+                            <th>여</th>
+                            <th>계</th>
+                            <th>남</th>
+                            <th>여</th>
+                            <th>계</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in listInwon)
+                        {
+                            <tr>
+                                <td>@item.no</td>
+                                <td class="name">@NameSplit(item.name)</td>
+                                <td class="hap">@(item.primaryManHap == 0 ? "" : item.primaryManHap)</td>
+                                <td class="hap">@(item.primaryWomanHap == 0 ? "" : item.primaryWomanHap)</td>
+                                <td class="hap">@(item.primaryHap == 0 ? "" : item.primaryHap)</td>
+                                <td class="hap">@(item.middleManHap == 0 ? "" : item.middleManHap)</td>
+                                <td class="hap">@(item.middleWomanHap == 0 ? "" : item.middleWomanHap)</td>
+                                <td class="hap">@(item.middleHap == 0 ? "" : item.middleHap)</td>
+                                <td class="hap">@(listInwon.Sum(it => it.playerHap) == 0 ? "" : listInwon.Sum(it => it.playerHap))</td>
+                                <td class="hap">@(listInwon.Sum(it => it.officer) == 0 ? "" : listInwon.Sum(it => it.officer))</td>
+                                <td class="hap">@(listInwon.Sum(it => it.totalHap) == 0 ? "" : listInwon.Sum(it => it.totalHap))</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        /* size: 210mm 297mm; /*A4*/ */ margin: 0mm
+    }
+</style>
+
+<style>
+    .citysum {
+        font-weight: bold;
+    }
+
+    .hap {
+        font-weight: bold;
+    }
+
+    .name {
+        font-weight: bold;
+    }
+
+    .trHeader {
+        font-weight: bold;
+    }
+
+
+    .menu_title {
+        text-align: center;
+        color: #fff;
+        background-color: #0075bf;
+        width: 100%;
+        height: 250px;
+        margin-top: 100px;
+    }
+
+        .menu_title h3 {
+            line-height: 250px;
+        }
+
+    .sub_menu {
+        height: 50px;
+        line-height: 50px;
+        border-bottom: 1px solid #b8b8b8;
+    }
+
+        .sub_menu ul {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 95%;
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+            .sub_menu ul li {
+                line-height: 50px;
+            }
+
+        .sub_menu .on {
+            color: #0075bf;
+            border-bottom: 2px solid #0075bf;
+        }
+
+        .sub_menu ul li:hover {
+            color: #0075bf;
+            border-bottom: 2px solid #0075bf;
+        }
+
+    #search .wrap {
+        width: 95%;
+        max-width: 1240px;
+        margin: 50px auto;
+        text-align: center;
+    }
+
+    .filter {
+        display: flex;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+        width: 100%;
+        padding: 20px 50px;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+        .filter select {
+            border-radius: 50px;
+            background-color: #fff;
+            flex: 1;
+            height: 50px;
+            padding: 10px;
+            background-image: url(../imgs/sub/select_arrow.png);
+            background-position: right 24px center;
+            background-repeat: no-repeat;
+        }
+
+        .filter button {
+            border-radius: 5px;
+            width: 180px;
+            font-size: 16px;
+            height: 50px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter .plus {
+            background-color: #0075bf;
+            color: #fff;
+        }
+
+        .filter .excel {
+            background-color: #fff;
+            color: #111;
+        }
+
+        .filter .line {
+            border-left: 1px solid #9b9b9b;
+        }
+
+    .modal_list select {
+        border-radius: 50px;
+        background-color: #fff;
+        flex: 1;
+        width: 200px;
+        height: 40px;
+        padding: 10px;
+        background-image: url(../imgs/sub/select_arrow.png);
+        background-position: right 24px center;
+        background-repeat: no-repeat;
+    }
+
+    @@media screen and (max-width: 900px) {
+        .filter {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .filter button {
+                width: 100%;
+            }
+    }
+
+    .data_list {
+        margin: 50px auto;
+        width: 95%;
+    }
+
+    .delet_area {
+        width: 100%;
+        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 30px;
+    }
+
+    .delet {
+        border-radius: 5px;
+        border: 1px solid #bbbbbb;
+        width: 120px;
+        font-size: 16px;
+        height: 50px;
+        padding: 0 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #111;
+    }
+
+    .delet_icon {
+        border-radius: 50px;
+        height: 18px;
+        width: 18px;
+        border: 2px solid #dc0000;
+        color: #dc0000;
+        line-height: 15px;
+        margin: 0 auto;
+    }
+
+    .table {
+        table-layout: fixed;
+        width: 100%;
+        text-align: center;
+    }
+
+        .table tr {
+        }
+
+        .table th {
+            background: #eef4ff;
+            padding: 20px 10px;
+            word-break: break-all
+        }
+
+        .table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #ccc;
+            word-break: break-all
+        }
+
+            .table td a {
+                text-decoration: underline;
+            }
+
+                .table td a:hover {
+                    color: #0075bf
+                }
+
+    .trFooter {
+        background-color: lightgoldenrodyellow;
+    }
+
+    @@media screen and (max-width:768px) {
+        /*block*/
+        .table--block thead {
+            display: none;
+        }
+
+        .table--block tr {
+            display: block;
+            margin-bottom: 10px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .table--block th,
+        .table--block td {
+            display: block;
+            position: relative;
+            padding: 10px 0;
+            padding-left: 50%;
+            border-width: 0 0 1px 0;
+        }
+
+            .table--block td:before {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 50%;
+                padding: 10px 0;
+                background: #eef4ff;
+            }
+
+            .table--block td:nth-child(1):before {
+                content: '선택';
+            }
+
+            .table--block td:nth-child(2):before {
+                content: '순번';
+            }
+
+            .table--block td:nth-child(3):before {
+                content: '종목';
+            }
+
+            .table--block td:nth-child(4):before {
+                content: '종별';
+            }
+
+            .table--block td:nth-child(5):before {
+                content: '이름';
+            }
+
+            .table--block td:nth-child(6):before {
+                content: '생년월일';
+            }
+
+            .table--block td:nth-child(7):before {
+                content: '소속';
+            }
+
+            .table--block td:nth-child(8):before {
+                content: '학년';
+            }
+
+            .table--block td:nth-child(9):before {
+                content: '세부1';
+            }
+
+            .table--block td:nth-child(10):before {
+                content: '비고';
+            }
+
+            .table--block td:nth-child(11):before {
+                content: '삭제';
+            }
+    }
+
+    /* 모달 스타일 */
+    /*모달버튼*/
+    .modal-content {
+        width: 100%;
+        top: 0;
+    }
+
+    .modal-custom {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 9999;
+        cursor: pointer;
+        display: none;
+        text-align: center;
+    }
+
+    .modal-window {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        z-index: 9999;
+        width: 95%;
+        max-width: 700px;
+    }
+
+    .close-modal {
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close-modal img {
+            margin-bottom: 20px
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    .close-area {
+        cursor: pointer;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-wrap {
+        margin-top: 20px;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 100);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 10px;
+        max-width: 700px;
+        width: 95%;
+        padding: 50px 30px;
+        margin: 0 auto;
+        max-height: calc(100vh - 100px);
+        overflow: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal_list {
+        width: 100%;
+        display: flex;
+        font-size: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        text-align: left;
+        gap: 10px;
+    }
+
+
+        .modal_list .type {
+            width: 45%;
+            padding-bottom: 15px;
+        }
+
+        .modal_list .full {
+            width: 100%;
+        }
+
+
+        .modal_list .type .title {
+            font-weight: 600;
+        }
+
+        .modal_list .type .data {
+            margin-top: 10px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 400;
+            /* border-bottom: 1px solid #333; */
+        }
+
+    .btn_wrap {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+        .btn_wrap button {
+            border-radius: 5px;
+            width: 180px;
+            color: #fff;
+            width: 40%;
+            height: 50px;
+        }
+
+    .cancel {
+        background-color: #666;
+        color: #fff
+    }
+
+    .edit {
+        background-color: #0075bf;
+        color: #fff
+    }
+
+    .delete {
+        background-color: red;
+        color: #fff
+    }
+</style>
+
+<style>
+    .showCSS {
+        display: inline;
+    }
+
+    .hideCss {
+        display: none;
+    }
+
+    input {
+        font-size: 18px;
+        color: #222222;
+        width: 250px;
+        border: 1px solid black;
+        padding: 3px;
+        height: 40px;
+        /*border-bottom: solid #aaaaaa 1px; */
+        /* padding-bottom: 10px;
+                                        padding-left: 10px; */
+        /* position: relative; */
+        background: none;
+        z-index: 5;
+    }
+
+        input::placeholder {
+            color: #aaaaaa;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        input:focus, .modal_list input:valid {
+            font-size: 16px;
+            bottom: 40px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        input:focus, .modal_list input:valid {
+            width: 100%;
+        }
+
+    .goBtn {
+        margin-left: 50px;
+        font-size: 16px;
+        color: white;
+        background: #fa5a5a;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    tr.total td {
+        font-weight: bold;
+        color: blue;
+        font-size: 1.1em;
+    }
+</style>

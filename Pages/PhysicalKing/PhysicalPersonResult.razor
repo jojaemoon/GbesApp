@@ -1,0 +1,327 @@
+﻿@page "/PhysicalPersonResult"
+
+<div class="menu_title subimg3">
+    <h3>경상북도 체력인증제</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        <li><a href="/MemberFirst">로그인정보</a></li>
+        <li><a href="/PhysicalIntro">대회요강</a></li>
+        <li><a href="/PhysicalPartyEntry">참가신청</a></li>
+        <li><a href="/PhysicalPartyInwon">참가현황</a></li>
+        <li class="on"><a href="/PhysicalResult">측정결과</a></li>
+    </ul>
+</div>
+
+<div id="search">
+    <div class="wrap">
+        <h2>2025 경상북도 체력인증제 자기점수 확인</h2>
+        <div class="filter">
+            <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+            아이디(번호)
+            <input type="text" class="form-control" @bind="loginID">
+            비밀번호
+            <input type="text" class="form-control" @bind="passWord">
+            <button class="btn btn-success" @onclick="ConfirmMember">확인</button>
+            @if (memberPass)
+            {
+                <span style="margin-left:30px;">비밀번호변경</span>
+                <input type="text" class="form-control" @bind="newPassword">
+                <button class="btn btn-danger" @onclick="ChangePass">저장</button>
+            }
+        </div>
+    </div>
+
+    @if (memberPass)
+    {
+        <div class="data_list">
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th class="tdSubject" colspan="3">
+                                2025 경북 학교체육 한마당
+                                <br /><br />
+                                체력인증제
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">
+                                <span id="tRank">@(memberRecord.rank)위</span>
+                                <span id="tJumsu">@(memberRecord.jumsuHap)점</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <span id="name">@memberRecord.name</span>
+                                <span id="sName">
+                                    @memberRecord.sName
+                                </span>
+                                <span id="schoolName">
+                                    @memberRecord.schoolName
+                                </span>
+                                <span id="schoolYear">
+                                    @(memberRecord.schoolYear)학년
+                                </span>
+                            </td>
+                        </tr>
+                        <tr id="title">
+                            <td>종목명</td>
+                            <td>기록</td>
+                            <td>점수</td>
+                            @* <td>순위</td> *@
+                        </tr>
+                        <tr id="trRecord">
+                            <td>악력</td>
+                            <td>@memberRecord.gripRecord<span>kg</span></td>
+                            <td>@memberRecord.gripJumsu</td>
+                            @* <td>@memberRecord.gripRank</td> *@
+                        </tr>
+                        <tr id="trRecord">
+                            <td>제자리멀리뛰기</td>
+                            <td>@memberRecord.jumpRecord<span>cm</span></td>
+                            <td>@memberRecord.jumpJumsu</td>
+                            @* <td>@memberRecord.jumpRank</td> *@
+                        </tr>
+                        <tr id="trRecord">
+                            <td>윗몸앞으로굽히기</td>
+                            <td>@memberRecord.bendRecord<span>cm</span></td>
+                            <td>@memberRecord.bendJumsu</td>
+                            @* <td>@memberRecord.bendRank</td> *@
+                        </tr>
+                        <tr id="trRecord">
+                            <td>50m 달리기</td>
+                            <td>@TimeToHangul(memberRecord.run50mRecord)</td>
+                            <td>@memberRecord.run50mJumsu</td>
+                            @* <td>@memberRecord.run50mRank</td> *@
+                        </tr>
+                        <tr id="trRecord">
+                            <td>순환운동</td>
+                            <td>@TimeToHangul(memberRecord.movementRecord)</td>
+                            <td>@memberRecord.movementJumsu</td>
+                            @* <td>@memberRecord.movementRank</td> *@
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="tdSubject" colspan="3">
+                                인증일 2025. 11. 2.<br /><br />
+                                경상북도교육감
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<style>
+
+    @@media screen and (max-width:768px) {
+        .table--block td {
+            min-width: 50px;
+        }
+    }
+
+</style>
+
+<style>
+    input {
+        font-size: 18px;
+        color: #222222;
+        width: 250px;
+        border: 1px solid black;
+        padding: 3px;
+        height: 40px;
+        /*border-bottom: solid #aaaaaa 1px; */
+        /* padding-bottom: 10px;
+                                            padding-left: 10px; */
+        /* position: relative; */
+        background: none;
+        z-index: 5;
+    }
+
+        input::placeholder {
+            color: #aaaaaa;
+            font-size: 12px;
+        }
+
+    /* input:focus {
+                                        outline: none;
+                                    }
+
+                                    input:focus, .modal_list input:valid {
+                                        font-size: 16px;
+                                        bottom: 40px;
+                                        color: #666;
+                                        font-weight: bold;
+                                    }
+
+                                    input:focus, .modal_list input:valid {
+                                        width: 100%;
+                                    }*/
+    .ddlCity, .ddlName {
+        width: 100px;
+        border-radius: 50px;
+        border: 1px solid black;
+        height: 50px;
+        padding: 10px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .inputRank {
+        width: 70px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .inputName {
+        width: 120px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .inputSchoolName {
+        width: 200px;
+    }
+
+    .inputSchoolYear {
+        width: 70px;
+        text-align: center;
+    }
+
+    .inputRecord {
+        width: 100px;
+        text-align: center;
+    }
+
+        .inputRecord:focus {
+            width: 100px;
+        }
+
+    .inputEtc {
+        width: 150px;
+    }
+
+    .inputRank:focus {
+        width: 70px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputName:focus {
+        width: 120px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputSchoolName:focus {
+        width: 200px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputSchoolYear:focus {
+        width: 70px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputRecord:focus {
+        width: 100px;
+        border: 2px solid blue;
+        background-color: beige;
+    }
+
+    .inputEtc:focus {
+        width: 150px;
+    }
+
+    .edit {
+        color: white;
+        background: #7fccde;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .delete {
+        color: white;
+        background: #cb99c5;
+        margin-left: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .save {
+        color: white;
+        background: #fa5a5a;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .cancel {
+        color: white;
+        background: #f0d264;
+        margin-left: 5px;
+        padding: 5px;
+        border-radius: 12px;
+    }
+
+    .inputPass {
+        width: 200px;
+    }
+
+        .inputPass:focus {
+            width: 200px;
+            border: 2px solid blue;
+            background-color: beige;
+        }
+
+    .tdJumsu {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: blue;
+    }
+
+    .tdJumsu {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: red;
+    }
+
+    .table tr td {
+        vertical-align: middle;
+    }
+
+    .tdSubject {
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    #tRank {
+        font-weight: bold;
+        font-size: 18px;
+        color: red;
+    }
+
+    #tJumsu {
+        font-weight: bold;
+        font-size: 18px;
+        margin-left: 30px;
+    }
+
+    #name, #sName, #schoolName, #schoolYear {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    #sName, #schoolName, #schoolYear {
+        margin-left: 24px;
+    }
+</style>

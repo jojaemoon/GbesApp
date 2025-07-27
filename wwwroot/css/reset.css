@@ -1,0 +1,182 @@
+@charset "UTF-8";
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box
+}
+
+
+html,
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+dl,
+dt,
+dd,
+table,
+thead,
+tbody,
+tfoot,
+tr,
+th,
+td,
+span,
+em,
+p,
+strong,
+del,
+s,
+q,
+blockquote,
+address,
+form,
+input,
+fieldset,
+legend,
+button,
+select,
+option,
+textarea,
+label,
+ul,
+ol,
+li,
+a,
+div,
+header,
+nav,
+aside,
+section,
+footer,
+article,
+video,
+img {
+    font-size: 1.0em;
+    line-height: 1.0;
+    font-style: normal;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+}
+
+ul,
+ol,
+li {
+    list-style: none;
+}
+
+table,
+tr,
+th,
+td {
+    border-collapse: collapse;
+}
+
+a {color:#111111;
+    text-decoration: none;
+}
+
+fieldset {
+    border: 0;
+}
+
+button {
+    cursor: pointer;
+}
+
+select {
+    border: 0;
+    background: none;
+}
+
+select {
+
+    -webkit-appearance:none; /* for chrome */
+ 
+    -moz-appearance:none; /*for firefox*/
+ 
+    appearance:none;
+ 
+ }
+ 
+ select::-ms-expand{
+ 
+    display:none;/*for IE10,11*/
+ 
+ }
+.skip {
+    display: none;
+}
+
+/* Scroll bar */
+html {
+    height: 100%;
+    overflow-y: scroll;
+    scrollbar-3dLight-Color: #333;
+    scrollbar-arrow-color: #777;
+    scrollbar-base-color: #333;
+    scrollbar-Face-Color: #fff;
+    scrollbar-Track-Color: #333;
+    scrollbar-DarkShadow-Color: #333;
+    scrollbar-Highlight-Color: #333;
+    scrollbar-Shadow-Color: #fff
+}
+
+::-moz-selection {
+    background: #05375a81;
+    color: white;
+    text-shadow: none
+}
+
+::selection {
+    background: #05375a81;
+    color: white;
+    text-shadow: none
+}
+
+::-webkit-scrollbar {
+    width: 10px
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bbbbbb;
+    border-radius: 10px
+}
+
+::-webkit-scrollbar-track {
+    background: #dddddd
+}
+
+::scrollbar {
+    width: 10px
+}
+
+::scrollbar-thumb {
+    background: #bbbbbb;
+    border-radius: 10px
+}
+
+::scrollbar-track {
+    background: #dddddd
+}
+
+/* html body*/
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    word-break: keep-all;
+}

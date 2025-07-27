@@ -1,0 +1,24 @@
+﻿@page "/loginControl"
+@inject NavigationManager _navManager
+
+@* <AuthorizeView Roles="경북교육청, manager">
+    <p>관리자로 로그인 하였습니다.</p>
+</AuthorizeView> *@
+
+<AuthorizeView>
+    <Authorized>
+        <a class="ml-md-auto"
+           href="MemberInfo">@context.User.Identity.Name!</a>
+        <a class="ml-md-auto btn btn-primary"
+           href="/Auth/logout?returnUrl=/Index"
+           target="_top">로그아웃</a>
+        @*<a class="ml-md-auto btn btn-primary"
+        href="/logout?returnUrl=/"
+        target="_top">로그아웃</a>*@
+    </Authorized>
+    <NotAuthorized>
+        <a class="ml-md-auto btn btn-primary"
+           href="/Auth/LoginRazor"
+           target="_top">로그인</a>
+    </NotAuthorized>
+</AuthorizeView>

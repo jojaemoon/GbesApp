@@ -1,0 +1,209 @@
+﻿@page "/BoyGameOfficials"
+
+<div class="menu_title subimg3">
+    <h3>경상북도소년체육대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/MemberFirst">로그인정보</a></li>
+        }
+        <li><a href="/BoyIntro" class="dropdown-item">대회요강</a></li>
+        <li><a href="/BoyPartyEntry" class="dropdown-item">참가신청</a></li>
+        <li><a href="/BoyCityInwon" class="dropdown-item">참가현황</a></li>
+        <li><a href="/BoyGameResult" class="dropdown-item">경기결과</a></li>
+       @*  <li><a href="/BoySelection" class="dropdown-item">선발현황</a></li> *@
+        @if (memberPart == "경기단체" || memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/BoyGameOfficials">시간할애</a></li>
+        }
+        @if (memberPart == "경북교육청" || memberPart == "관리자")
+        {
+            <li><a href="/BoyGamePartyEnd">마감처리</a></li>
+        }
+    </ul>
+</div>
+
+@if (!isMember)
+{
+    <h2>로그인 후 사용 가능 합니다.....</h2>
+}
+else
+{
+    <div id="search">
+        <div class="wrap">
+            <h2>2025 경북소년체육대회 경기임원 기간 할애 목록 <span class="red" style="margin-left: 50px;">대상자 @listGameOfficer.Count<span>명</span></span></h2>
+            <div class="filter">
+                <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+                <select value="@gName" @onchange="SelectGameName">
+                    <option>종목선택</option>
+                    @foreach (var item in gNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <div class="line"></div>
+                <button id="addPlayer" class="plus" @onclick="ModalOpenNewPlayer">
+                    <div>대상자추가</div>
+                    <div>+</div>
+                </button>
+                <button id="excelDown" class="excel" @onclick="DownLoadGameOfficers">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            </div>
+        </div>
+
+        <div class="data_list">
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th style="width:7%">순번</th>
+                            <th>종목</th>
+                            <th>이름</th>
+                            <th>소속</th>
+                            <th>직위</th>
+                            <th>종목직책</th>
+                            <th style="width:15%">시간할애 기간</th>
+                            <th>비고</th>
+                            <th style="width:7%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+
+                        @foreach (var item in listGameOfficer)
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.gName</td>
+                                <td>@item.name</td>
+                                <td>@item.schoolName</td>
+                                <td>@item.schoolPosition</td>
+                                <td>@item.gamePosition</td>
+                                <td>@item.term</td>
+                                <td>@item.etc</td>
+                                <td>
+                                    <a href="javascript:openModal('modal1');" class="modal-custom-button" @onclick="(()=>ModalEdit(item))">수정</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+<!--모달창-->
+<div class="modal-custom modal-customOfficer modal-content modal1">
+    <div class="modal-window">
+        <a href="javascript:closeModal();">
+            <span class="close-modal"><img src="../imgs/sub/close.png"></span>
+        </a>
+        <div class="modal-wrap">
+            <div class="modal_list">
+                <div class="type">
+                    <div class="title">종목</div>
+                    <div class="data">
+                        <select @bind="modalSelectGame">
+                            <option>종목선택</option>
+                            @foreach (var item in gNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">이름</div>
+                    <div class="data">
+                        <input type="text" @bind="model.name" />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">시군</div>
+                    <div class="data">
+                        <select @bind="modalSelectCity">
+                            @* disabled="@isDisabledCity" *@
+                            <option>시군선택</option>
+                            @foreach (var item in cNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">학교명</div>
+                    <div class="data">
+                        <select @bind="modalSelectSchool">
+                            @* disabled="@isDisabledSchool" *@
+                            <option>학교선택</option>
+                            @foreach (var item in schoolNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">직위</div>
+                    <div class="data">
+                        <select @bind="modalSelectSchoolPosition">
+                            <option>직위선택</option>
+                            @foreach (var item in listSchoolPosition)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">경기직책</div>
+                    <div class="data">
+                        <select @bind="modalSelectGamePosition">
+                            <option>경기직책선택</option>
+                            @foreach (var item in listGamePosition)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">시간할애기간</div>
+                    <div class="data">
+                        <input type="text" @bind="model.term" placeholder="mm.dd ~ mm.dd  예) 10.26 ~ 10.29" />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">비고</div>
+                    <div class="data">
+                        <input type="text" @bind="model.etc" />
+                    </div>
+                </div>
+            </div>
+            <div class="btn_wrap">
+                <button class="edit" @onclick="SaveModel">저장</button>
+                <button class="delete" @onclick="DeleteModel">삭제</button>
+                <button class="cancel" @onclick="CancelModel">작성취소</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    #addPlayer:hover {
+        background-color: lightseagreen;
+    }
+
+    #excelDown:hover {
+        background-color: yellow;
+    }
+</style>

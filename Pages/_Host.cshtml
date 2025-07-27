@@ -1,0 +1,302 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace GBES.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@*
+@if(Request.Query["StudentJonghapResult"].FirstOrDefault()=="1")
+{
+    Html.RenderPartial("_HostJonghap.cshtml",null,ViewData);
+    return;
+} *@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--브라우저호환성-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <base href="~/" />
+    <title>경북학교체육지원 시스템</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../js/print.js"></script>
+    <!-- RESET -->
+    <link href="../css/reset.css" rel="stylesheet">
+    <!--font-->
+    <link href="https://webfontworld.github.io/TheJamsil/TheJamsil.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <!--js,css-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+    <link href="../css/studentJonghapresult.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/reset.css" rel="stylesheet">
+    <link href="../css/css.css" rel="stylesheet">
+
+    <!--반응형표
+    <link href="../css/r_graph.css" rel="stylesheet">-->
+    <!--비반응형표-->
+    <link href="../css/graph.css" rel="stylesheet">
+
+    <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
+    <script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.menu_btn').click(function () {
+                $('.menu_btn').toggleClass('lijo');
+                $('.gnb').toggleClass('surya');
+            });
+
+            $('.gnb li').click(function () {
+                $(this).find('.sub').slideToggle();
+                var t = $(this).find('.sub');
+                $('.sub').not(t).slideUp();
+            });
+            var max_h = 0;
+            $(".sub").each(function () {
+                var h = parseInt($(this).css("height"));
+                if (max_h < h) {
+                    max_h = h;
+                }
+            });
+            // 마우스 over 시
+            $('.gnb').mouseenter(function () {
+                // menu bg
+                var menuHeight = $('#header').outerHeight();
+                $('.hd_bg').css({
+                    'top': menuHeight + 'px',
+                    height: max_h + 30 + 'px',
+                });
+                $('#header').addClass('open');
+            });
+            $('.gnb').mouseleave(function () {
+                $('.hd_bg').css('height', '0');
+                $('#header').removeClass('open');
+            });
+            $('.gnb > li').mouseenter(function () {
+                $(this).addClass('active');
+                $(this).siblings().removeClass('active')
+            });
+            $('.gnb > li').mouseleave(function () {
+                $(this).removeClass('active');
+            });
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    $(window).scroll(function () {
+        //        var scroll = $(window).scrollTop();
+        //        if (scroll > 1) {
+        //            $("#header").addClass('on');
+        //        }
+        //        else {
+        //            $("#header").removeClass('on');
+        //        }
+        //    })
+        //})
+    </script>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+    <!-- Initialize Swiper -->
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            spaceBetween: 30,
+            centeredSlides: true,
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            }
+        });
+    </script>
+    <script>
+        var swiper = new Swiper(".mySwiper2", {
+            slidesPerView: 1,
+            spaceBetween: 10,
+            loop: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 10,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 10,
+                },
+            },
+        });
+    </script>
+
+    <script>
+        //팝업 열기
+        function openModal(modalname) {
+            document.get
+            $("." + modalname).fadeIn(300);
+        }
+        // 팝업 닫기
+        //function closeModal(modalname) {
+        //    document.get
+        //    $("." + modal - customOfficer).fadeOut(300);
+        //}
+        // $('.close-modal').click(function () {
+        //     $(".modal-custom").fadeOut(300);
+        // });
+        function closeModal(modalname) {
+            if (modalname == "") {
+                $(".modal-custom").fadeOut(300);
+            }
+            $("." + modalname).fadeOut(300);
+        }
+
+        function loginPass(memName, memPart) {
+            //alert('A1');
+            $('#login').hide();
+            //alert('A2');
+            $('#hideMemberName').text(memName);
+            //alert('A3');
+            $('#memberName').text(memName);
+            //alert('A4');
+            $('#member').show();
+            //alert('A5');
+            $('#logout').show();
+            //alert('A6');
+            // if (memPart == "경북교육청" || memPart == "경기단체" || memberPart == "관리자" || memberPart == "교육지원청") {
+            //     $('#member').show();
+            // }
+            // else {
+            //     $('#member').hide();
+            // }
+        }
+
+        function loginOut() {
+            $('#login').show();
+            $('#hideMemberName').text('');
+            $('#memberName').text('')
+            $('#member').hide();
+            $('#logout').hide();
+            $('#memPart').hide();
+        }
+
+        function topcontainerNoDisplay() {
+            $('#topcontainer').hide();
+        }
+    </script>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <div id="topcontainer" class="container-fluid bg-light sticky-top ">
+        <div class="header_box">
+            <nav class="navbar navbar-dark navbar-expand-lg py-lg-0">
+                <a href="#">
+                    <h1 class="logo">
+                        LOGO
+                    </h1>
+                </a>
+                <button class="navbar-toggler " type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-dark"></span>
+                </button>
+                <div class="collapse navbar-collapse me-n3" id="navbarCollapse">
+                    <div class="navbar-nav  ms-auto">
+                        <div class="nav-item dropdown">
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">소년체육대회</a>
+                            <div class="dropdown-menu m-0 ">
+                                <a href="/BoyIntro" class="dropdown-item">대회요강</a>
+                                <a href="/BoyPartyEntry" class="dropdown-item">참가신청</a>
+                                <a href="/BoyCityInwon" class="dropdown-item">참가현황</a>
+                                <a href="/BoyGameResult" class="dropdown-item">경기결과</a>
+                               @*  <a href="/BoySelection" class="dropdown-item">선발현황</a> *@
+                            </div>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" style="font-weight:bold; color: red;">학년별육상경기대회</a>
+                            <div class="dropdown-menu m-0 ">
+                                <a href="/YearTrackIntro" class="dropdown-item">대회요강</a>
+                                <a href="/YearTrackPartyEntry" class="dropdown-item">참가신청</a>
+                                <a href="/YearTrackCityInwon" class="dropdown-item">참가현황</a>
+                                <a href="/YearTrackGameResult" class="dropdown-item">경기결과</a>
+                            </div>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">구간마라톤대회</a>
+                            <div class="dropdown-menu m-0 ">
+                                <a href="/MarthonIntro" class="dropdown-item">대회요강</a>
+                                <a href="/MarthonPartyEntry" class="dropdown-item">참가신청</a>
+                                <a href="/MarthonPartyCityInwon" class="dropdown-item">참가현황</a>
+                                @* <a href="/MarthonGameRecord" class="dropdown-item">구간결과</a> *@
+                                <a href="/MarthonGameResult" class="dropdown-item">종합결과</a>
+                            </div>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">학교스포츠클럽대회</a>
+                            <div class="dropdown-menu m-0 ">
+                                <a href="" class="dropdown-item">대회요강</a>
+                                <a href="" class="dropdown-item">참가신청</a>
+                                <a href="" class="dropdown-item">참가현황</a>
+                                <a href="" class="dropdown-item">경기결과</a>
+                                @* <a href="" class="dropdown-item">선발현황</a> *@
+                            </div>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">학생체육대회</a>
+                            <div class="dropdown-menu m-0 ">
+                                <a href="/StudentIntro" class="dropdown-item">일정(전체,육상)</a>
+                                <a href="/StudentPartyEntry" class="dropdown-item">참가신청</a>
+                                <a href="/StudentPartyGameInwon" class="dropdown-item" id="studentParty">참가현황</a>
+                                <a href="/StudentGameResult" class="dropdown-item">경기결과</a>
+                                <a href="/StudentJonghapResult" class="dropdown-item" id="testClick">육상성적</a>
+                            </div>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">경북체력인증</a>
+                            <div class="dropdown-menu m-0 ">
+                                <a href="/PhysicalIntro" class="dropdown-item">안내</a>
+                                <a href="/PhysicalPartyEntry" class="dropdown-item">참가신청</a>
+                                <a href="/PhysicalPartyInwon" class="dropdown-item">참가현황</a>
+                                <a href="/PhysicalResult" class="dropdown-item">측정결과</a>
+                                <a href="/PhysicalPersonResult" class="dropdown-item">개인체력성적</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="login">
+                <a id="member" href="/memberfirst" style="display: none; color: blue;"><span id="memberName"></span></a>
+                <a id="logout" href="/Logout" style="display: none; margin-left: 10px; color: red;">로그아웃</a>
+                <a id="login" href="/login" class="btn bg-main text-w">로그인</a>
+            </div>
+        </div>
+    </div>
+
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    @* <div class="top_btn"> <a href="#"><img src="../imgs/main/top_btn.png"></a></div> *@
+
+
+</body>
+
+<script src="~/_framework/blazor.server.js"></script>
+<script src="~/js/SaveAsFile.js"></script>
+
+
+
+</html>
+

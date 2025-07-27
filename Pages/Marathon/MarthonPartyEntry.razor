@@ -1,0 +1,247 @@
+﻿@page "/MarthonPartyEntry"
+
+<div class="menu_title subimg2">
+    <h3>2025 교육감배 초·중 구간마라톤대회</h3>
+</div>
+<div class="sub_menu">
+    <ul>
+        <li><a href="/MemberFirst">로그인정보</a></li>
+        <li class="on"><a href="/MarthonIntro">대회요강</a></li>
+        <li><a href="/MarthonPartyEntry">참가신청</a></li>
+        <li><a href="/MarthonPartyCityInwon">시군별참가현황</a></li>
+        <li><a href="/MarthonGameResult">경기결과</a></li>
+    </ul>
+</div>
+
+@if (!isMember)
+{
+    <h2>로그인 후 사용 가능 합니다.....</h2>
+}
+else
+{
+    <div id="search">
+        <div class="wrap">
+            <h2>2025 교육감배 시·군대항 초·중 구간마라톤대회 <span style="margin-left: 50px;" class="blue">@cName<span>교육지원청</span></span></h2>
+            <div class="filter">
+                <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+                <select value="@cName" @onchange="SelectCity" disabled="@isDisabledCity">
+                    <option>시/군</option>
+                    @foreach (var item in cNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <select value="@sName" @onchange="SelectSectionName">
+                    <option>종별선택</option>
+                    @foreach (var item in sNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <div class="line"></div>
+                @* <button id="addPlayer" class="plus" @onclick="ModalOpenNewPlayer">
+            <div>선수추가</div>
+            <div>+</div>
+            </button> *@
+                <button id="excelDown" class="excel" @onclick="DownLoadPartyEntry">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            </div>
+        </div>
+
+        <div class="data_list">
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>종별</th>
+                            <th>구간</th>
+                            <th>학 교 명</th>
+                            <th>성 명</th>
+                            <th>학년</th>
+                            <th>성별</th>
+                            <th>비고</th>
+                            <th class="@showOrHideClass" style="width:10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in listPartyEntry)
+                        {
+                            <tr>
+                                <td>@item.sName</td>
+                                <td>@item.dNameOne</td>
+                                @if (!isEdit)
+                                {
+                                    <td>@item.schoolName</td>
+                                    <td>@item.name</td>
+                                    <td>@item.schoolYear</td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <div class="type">
+                                            <div class="title"></div>
+                                            <div class="data">
+                                                <select @bind="item.schoolName" class="ddlSchName">
+                                                    <option>선택</option>
+                                                    @foreach (var schName in schoolNameList)
+                                                    {
+                                                        <option>@schName</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="text" @bind="item.name" class="inputPlayerName" />
+                                    </td>
+                                    <td>
+                                        <input type="text" @bind="item.schoolYear" class="inputSchoolYear" />
+                                    </td>
+                                }
+                                <td>@item.part</td>
+                                <td>@item.dNameFive</td>
+                                <td class="@showOrHideClass">
+                                    @if (!isEdit)
+                                    {
+                                        <button @onclick="Edit_Clicked">수정</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btnSave" @onclick="(()=>Save_Clicked(item))">저장</button>
+                                        <button class="btnDelete" @onclick="(()=>Delete_Clicked(item))" style="margin:auto 5px;">삭제</button>
+                                        <button class="btnCancel" @onclick="(()=>Cancel_Clicked())">취소</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+<!--모달창-->
+<div class="modal-custom modal-content modal1">
+    <div class="modal-window">
+        <a href="javascript:closeModal('modal-custom');">
+            <span class="close-modal"><img src="../imgs/sub/close.png"></span>
+        </a>
+        <div class="modal-wrap">
+            <div class="modal_list">
+                <div class="type">
+                    <div class="title">시군 종별</div>
+                    <div class="data" style="font-size: 1.2em;">
+                        @model.city &nbsp;&nbsp; @model.sName
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">구간</div>
+                    <div class="data">
+                        <select @bind="DdlDname">
+                            <option>구간선택</option>
+                            @foreach (var item in dNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">학교명</div>
+                    <div class="data">
+                        <select @bind="modalSelectSchool">
+                            <option>학교선택</option>
+                            @foreach (var item in schoolNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">이름</div>
+                    <div class="data">
+                        <input type="text" @bind="model.name" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">학년</div>
+                    <div class="data">
+                        <input type="text" @bind="model.schoolYear" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">성별</div>
+                    <div class="data">
+                        <select @bind="model.part" disabled>
+                            <option></option>
+                            <option>남</option>
+                            <option>여</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">비고</div>
+                    <div class="data">
+                        <input type="text" @bind="model.dNameFive" />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">&nbsp;</div>
+                    <div class="data">
+                        &nbsp;
+                    </div>
+                </div>
+            </div>
+            <div class="btn_wrap">
+                <button class="edit" @onclick="SaveModel">저장</button>
+                @if (isEdit)
+                {
+                    <button class="delete" @onclick="DeleteModel">삭제</button>
+                }
+                <button class="cancel" @onclick="CancelModel">작성취소</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .inputPlayerName {
+        max-width: 120px;
+    }
+
+    .inputSchoolYear {
+        max-width: 60px;
+    }
+
+    .inputPlayerName:focus {
+        max-width: 120px;
+    }
+
+    .inputSchoolYear:focus {
+        max-width: 60px;
+    }
+
+    .ddlSchName {
+        max-width: 180px;
+        border: 1px solid #C4C4C4;
+        box-sizing: border-box;
+        border-radius: 10px;
+        padding: 12px 13px;
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 16px;
+    }
+    .ddlSchName:focus {
+        border: 1px solid #9B51E0;
+        box-sizing: border-box;
+        border-radius: 10px;
+        outline: 3px solid #F8E4FF;
+        border-radius: 10px;
+    }
+</style>

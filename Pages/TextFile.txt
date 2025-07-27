@@ -1,0 +1,221 @@
+﻿<div id="search">
+        <div class="wrap">
+            <h2>2023 경북학생체육대회 참가선수 목록 <span class="red">결과 @inwon<span>명</span></span></h2>
+            <div class="filter">
+                <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
+                <select value ="@cName" @onchange="SelectCity">
+                    <option>시/군</option>
+                    @foreach (var item in cNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <select @onchange="SelectGameName">
+                    <option>종목선택</option>
+                    @foreach (var item in gNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <select @onchange="SelectSectionName">
+                    <option>종별선택</option>
+                    @foreach (var item in sNameList)
+                    {
+                        <option>@item</option>
+                    }
+                </select>
+                <div class="line"></div>
+                <button class="plus">
+                    <div>선수추가</div>
+                    <div>+</div>
+                </button>
+                <button class="excel">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            </div>
+        </div>
+
+        <div class="data_list">
+            @* <div class="delet_area">
+        <button class="delet">
+        <div>선택 삭제</div>
+        <div class="delet_icon">-</div>
+        </button>
+        </div> *@
+
+            <div>
+                <table class="table table--block" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            @* <th style="width:7%">선택</th> *@
+                            <th style="width:10%">순번</th>
+                            <th>종목</th>
+                            <th>종별</th>
+                            <th>이름</th>
+                            <th>생년월일</th>
+                            <th>소속</th>
+                            <th style="width:7%">학년</th>
+                            <th>세부종목</th>
+                            <th>비고</th>
+                            <th class="@showOrHideClass" style="width:5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+
+                        @foreach (var item in listPartyEntry)
+                        {
+                            i++;
+                            <tr>
+                                @* <td><input type="checkbox"></td> *@
+                                <td>@i</td>
+                                <td>@item.gName</td>
+                                <td>@item.sName</td>
+                                <td><a href="javascript:openModal('modal1');" class="modal-custom-button" @onclick="(()=>ModalEdit(item))">@item.name</a></td>
+                                <td>@item.jumin</td>
+                                <td>@item.schoolName</td>
+                                <td>@item.schoolYear</td>
+                                <td>@DetailNames(item)</td>
+                                <td>@item.etc</td>
+                                <td class="@showOrHideClass">
+                                    <a href="javascript:openModal('modal1');" class="modal-custom-button" @onclick="(()=>ModalEdit(item))">수정</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--모달창-->
+<div class="modal-custom modal-content modal1">
+    <div class="modal-window">
+        <a href="javascript:closeModal();">
+            <span class="close-modal"><img src="../imgs/sub/close.png"></span>
+        </a>
+        <div class="modal-wrap">
+            <div class="modal_list">
+                <div class="type">
+                    <div class="title">종목</div>
+                    <div class="data">
+                        <select value="@model.gName" @onchange="ModalSelectGameName">
+                            <option>종목선택</option>
+                            @foreach (var item in gNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">종별</div>
+                    <div class="data">
+                        <select value="@model.sName" @onchange="ModalSelectSectionName">
+                            <option>종별선택</option>
+                            @foreach (var item in sNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">이름</div>
+                    <div class="data">
+                        <input type="text" @bind="model.name" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">생년월일</div>
+                    <div class="data">
+                        <input type="text" @bind="model.jumin" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">소속</div>
+                    <div class="data">
+                        <input type="text" @bind="model.schoolName" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">학년</div>
+                    <div class="data">
+                        <input type="text" @bind="model.schoolYear" required />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">세부종목 1</div>
+                    <div class="data">
+                        <select value="@model.dNameOne" @onchange="ModalSelectDetailNameOne" required>
+                            <option>선택</option>
+                            @foreach (var item in sNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">세부종목 2</div>
+                    <div class="data">
+                        <select value="@model.dNameTwo" @onchange="ModalSelectDetailNameTwo">
+                            <option>선택</option>
+                            @foreach (var item in sNameList)
+                            {
+                                <option>@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                @if (isSelectTwo)
+                {
+                    <div class="type">
+                        <div class="title">세부종목 3</div>
+                        <div class="data">
+                            <select value="@model.dNameThree" @onchange="ModalSelectDetailNameThree">
+                                <option>선택</option>
+                                @foreach (var item in sNameList)
+                                {
+                                    <option>@item</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+                @if (isSelectThree)
+                {
+                    <div class="type">
+                        <div class="title">세부종목 4</div>
+                        <div class="data">
+                            <select value="@model.dNameFour" @onchange="ModalSelectDetailNameFour">
+                                <option>선택</option>
+                                @foreach (var item in dNameList)
+                                {
+                                    <option>@item</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+                @if (isSelectFour)
+                {
+                    <div class="type full">
+                        <div class="title">비고</div>
+                        <div class="data">
+                            <input type="text" @bind="model.etc" />
+                        </div>
+                    </div>
+                }
+
+            </div>
+            <div class="btn_wrap">
+                <button class="edit" @onclick="SaveModel">수정완료</button>
+                <button class="cancel" @onclick="CancelModel">작성취소</button>
+            </div>
+
+        </div>
+    </div>
+</div>

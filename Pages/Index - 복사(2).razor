@@ -1,0 +1,277 @@
+﻿@page "/"
+@page "/indexTwo"
+
+<main>
+    <div class="container">
+        <!-- Swiper -->
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="main_cont" style="padding-left:80px;">
+                        <div class="text_area">
+                            <div class="cont">
+                                <h1>2025 경상북도교육감배 초·중학년별 육상경기대회</h1>
+                                <h2>2025. 6. 17.(화) ~ 2025. 6. 19.(목)</h2>
+                                <h2>예천스타디움</h2>
+                                <a href="#">
+                                    <div class="btn">참가 신청 접수중</div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="img-center">
+                            <img src="/imgs/main/boy2024_1.jpg" class="img">
+                        </div>
+                    </div>
+                </div>
+            @* <div class="swiper-slide" style="background-color: white;">
+                <div class="main_cont">
+                <div class="text_area">
+                <div class="cont">
+                <h1>2024_교육감배초중구간마라톤대회</h1>
+                <h2>2024. 9. 6.(금) 09:00∼ (중학부: 09:00, 초등부: 13:00)</h2>
+                <h2>예천군 일원(남·여 혼성)</h2>
+                <a href="#" class="btn btn-primary" @onclick="MarathonResultDown">
+                결과다운로드
+                </a>
+                </div>
+                </div>
+                <div class="img-center">
+                <img src="/imgs/main/main_img4.jpg" class="img">
+                </div>
+                </div>
+                </div> *@
+            @*  <div class="swiper-slide">
+                    <div class="main_cont">
+                        <div class="text_area">
+                            <div class="cont">
+                                <h1>2024 도전!체력인증제</h1>
+                                <h2>2024. 11. 2.(토)</h2>
+                                <h2>포항 만인당</h2>
+                                <a href="PhysicalPartyEntry">
+                                    <div class="btn">참가신청 기간입니다</div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="img-center">
+                            @if (imgSu == 1)
+                            {
+                                <img src="/imgs/main/231104-3497.jpg" class="img">
+                            }
+                            else if (imgSu == 2)
+                            {
+                                <img src="/imgs/main/231104-3700.jpg" class="img">
+                            }
+                            else if (imgSu == 3)
+                            {
+                                <img src="/imgs/main/231104-4414.jpg" class="img">
+                            }
+                            else if (imgSu == 4)
+                            {
+                                <img src="/imgs/main/231104-7789.jpg" class="img">
+                            }
+
+                        </div>
+                    </div>
+                </div> *@
+            </div>
+            <div class="swiper-pagination"></div>
+    </div>
+    <!--대회일정-->
+    <div id="section1">
+        <!-- Swiper -->
+        <div class="swiper mySwiper2">
+            <div class="button_box">
+                <h3>대회일정</h3>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="cont_box">
+                        <a href="#">
+                            <div class="tag">2025 경상북도교육감배 초·중학년별 육상경기대회</div>
+                            <div class="title"></div>
+                            <div class="data">
+                                일정 ㅣ <sapn>2025. 6. 17.(화) ~ 6. 19.(목)</sapn>
+                            </div>
+                            <div class="place">
+                                장소 ㅣ <sapn>예천스타디움</sapn>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="cont_box">
+                        <a href="/MarthonIntro">
+                            <div class="tag">2025 교육감배 시·군 대항 초·중 구간마라톤대회</div>
+                            <div class="title"></div>
+                            <div class="data">
+                                일정 ㅣ <sapn>2025. 9. .() 09:00∼ </sapn>
+                            </div>
+                            <div class="place">
+                                장소 ㅣ <sapn>미정</sapn>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="cont_box">
+                        <a href="/StudentIntro">
+                            <div class="tag">2025 경상북도학생체육대회</div>
+                        </a>
+                        @* <a href="/StudentJonghapResult">
+                        <div class="tag">육상종합성적 >></div>
+                    </a> *@
+                        <div class="title"></div>
+                        <div class="data">
+                            일정 ㅣ <sapn>2025. 10. .() ~ 10. .()</sapn>
+                        </div>
+                        <div class="place">
+                            장소 ㅣ <sapn>종목별 경기장</sapn>
+                        </div>
+                        <br />
+                        @* <a href="/StudentGameResult">
+                        <div class="tag">세부종목결과 >></div>
+                    </a>
+                    <a href="/StudentJongHapCityByul">
+                        <div class="tag">시군별성적 >></div>
+                    </a>
+                    <br /> *@
+                    </div>
+
+                    <div class="cont_box">
+                        <a href="/PhysicalIntro">
+                            <div class="tag">체력인증제</div>
+                        </a>
+                        @* <a href="/PhysicalResult">
+                        <div class="tag">결과 보기 >></div>
+                    </a> *@
+                        <div class="title"></div>
+                        <div class="data">
+                            일정 ㅣ <sapn>2025. 11. .() 09:30 ~</sapn>
+                        </div>
+                        <div class="place">
+                            장소 ㅣ <sapn>미정</sapn>
+                        </div>
+                        @* <br />
+                    <a href="/PhysicalPersonResult">
+                        <div class="tag">개인 체력성적 ></div>
+                    </a> *@
+                    </div>
+                </div>
+                <div class="cont_box">
+                    <div class="cont_box">
+                        <a href="/PhysicalIntro">
+                            <div class="tag">체력인증제</div>
+                            <div class="title">2024 경상북도 체력인증제</div>
+                            <div class="data">
+                                일정 ㅣ <sapn>2023. 11. 4.(토) 09:30 ~ 15:30</sapn>
+                            </div>
+                            <div class="place">
+                                장소 ㅣ <sapn>포항 만인당 일원</sapn>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="cont_box">
+                        <a href="#">
+                            <div class="tag">소년체육대회</div>
+                            <div class="title">2024 경상북도소년체육대회</div>
+                            <div class="data">
+                                일정 ㅣ <sapn>2024.03.02 ~ 2024.04.00</sapn>
+                            </div>
+                            <div class="place">
+                                장소 ㅣ <sapn>종목별 경기장</sapn>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="cont_box">
+                        <a href="#">
+                            <div class="tag">스포츠클럽대회</div>
+                            <div class="title">2024 경상북도학교스포츠클럽대회</div>
+                            <div class="data">
+                                일정 ㅣ <sapn>2024.08.01 ~ 2024.08.00</sapn>
+                            </div>
+                            <div class="place">
+                                장소 ㅣ <sapn>종목별 경기장</sapn>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--현황-->
+    <div id="section2">
+        <div class="container">
+            <h2>경상북도 학생들의 체육 발전에 항상 힘쓰겠습니다.</h2>
+            <h3>경상북도 학교 체육 경기 현황</h3>
+            <div class="wrap">
+                <a href="#">
+                    <div class="categori">
+                        <div class="img_box">
+                            <img src="/imgs/main/main_img3.jpg">
+                        </div>
+                        <span>소년 체육 대회</span>
+                    </div>
+                </a>
+                <a href="/MarthonIntro">
+                    <div class="categori">
+                        <div class="img_box">
+                            <img src="/imgs/main/main_img4.jpg">
+                        </div>
+                        <span>구간 마라톤 대회</span>
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="categori">
+                        <div class="img_box">
+                            <img src="/imgs/main/main_img6.jpg">
+                        </div>
+                        <span>학교 스포츠 클럽 대회</span>
+                    </div>
+                </a>
+                <a href="/StudentGameResult">
+                    <div class="categori">
+                        <div class="img_box">
+                            <img src="/imgs/main/main_img2.jpg">
+                        </div>
+                        <span>학생체육대회</span>
+                    </div>
+                </a>
+                <a href="/PhysicalIntro">
+                    <div class="categori">
+                        <div class="img_box">
+                            <img src="/imgs/main/main_img5.jpg">
+                        </div>
+                        <span>경북 체력 인증</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!--게시판-->
+    <div id="section3">
+        <h3> 대회 참가 신청</h3>
+
+        <ul>
+            <li>
+                <div class="type end">대회진행중</div>
+                <div class="notice_title"><a href="#">2025년 경북 소년 체육대회</a></div>
+                <div class="data">종료일 <span>2025. 4. </span></div>
+            </li>
+            <li>
+                <div class="type end">대회준비중</div>
+                <div class="notice_title"><a href="#">2025년 경북구간마라톤대회</a></div>
+                <div class="data">대회일 <span>2025. 월</span></div>
+            </li>
+            <li>
+                <div class="type ing">준비중</div>
+                <div class="notice_title"><a href="#">제62회 경상북도학생체육대회</a></div>
+                <div class="data">신청기간 <span>2025. 9월 ~</span></div>
+            </li>
+            <li>
+                <div class="type ing">준비중</div>
+                <div class="notice_title"><a href="#">2025년 경북체력인증대회</a></div>
+                <div class="data">대회일 <span>2025. 11월</span></div>
+            </li>
+        </ul>
+    </div>
+</main>
+

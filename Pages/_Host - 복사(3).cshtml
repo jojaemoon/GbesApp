@@ -1,0 +1,275 @@
+﻿@page "/abc"
+@using Microsoft.AspNetCore.Components.Web
+@namespace GBES.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--브라우저호환성-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <base href="~/" />
+    <title>경북학교체육지원 시스템</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- RESET -->
+    <link href="../css/reset.css" rel="stylesheet">
+    <!--font-->
+    <link href="https://webfontworld.github.io/TheJamsil/TheJamsil.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <!--js,css-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link href="../css/css.css" rel="stylesheet">
+    
+   
+    <script>
+        //팝업 열기
+        function openModal(modalname) {
+            document.get
+            $("." + modalname).fadeIn(300);
+        }
+        // 팝업 닫기
+        //function closeModal(modalname) {
+        //    document.get
+        //    $("." + modal - customOfficer).fadeOut(300);
+        //}
+        $('.close-modal').click(function () {
+            $(".modal-custom").fadeOut(300);
+        });
+        function closeModal(modalname) {
+            if(modalname==""){
+                $(".modal-custom").fadeOut(300);
+            }
+            $("." + modalname).fadeOut(300);
+        }
+         
+        function loginPass(memName, memPart) {
+            $('#login').hide();
+            $('#memberName').text(memName)
+            $('#member').show();
+            $('#logout').show();
+            if (memPart == "경북교육청" || memPart == "경기단체" || memberPart == "관리자") {
+                $('#memPart').show();
+            }
+            else {
+                $('#memPart').hide();
+            }
+        }
+
+        function loginOut() {
+            $('#login').show();
+            $('#memberName').text('')
+            $('#member').hide();
+            $('#logout').hide();
+            $('#memPart').hide();
+        }
+        
+    </script>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <a href="#">
+                <h1 class="logo">
+                    LOGO
+                </h1>
+            </a>
+
+            <a href="#" class="menu_btn">
+                <div></div>
+                <div></div>
+                <div></div>
+            </a>
+            <nav class="nav">
+                <ul class="gnb">
+                    <li>
+                        <a href="#">소년체육대회</a>
+                        <ul class="sub">
+                            <li><a href="#">대회요강</a></li>
+                            <li><a href="#">참가신청</a></li>
+                            <li><a href="#">참가현황</a></li>
+                            <li><a href="#">경기결과</a></li>
+                            <li><a href="#">선발현황</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">구간마라톤대회</a>
+                        <ul class="sub">
+                            <li><a href="/MarthonIntro">대회요강</a></li>
+                            @*<li><a href="/MarthonIntro">구간보기</a></li*@
+                            <li><a href="/MarthonPartyEntry">참가신청</a></li>
+                            <li><a href="/MarthonPartyCityInwon">참가현황</a></li>
+                            <li><a href="/MarthondGameResult">경기결과</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">학교스포츠클럽대회</a>
+                        <ul class="sub">
+                            <li><a href="#">대회요강</a></li>
+                            <li><a href="#">참가신청</a></li>
+                            <li><a href="#">참가현황</a></li>
+                            <li><a href="#">경기결과</a></li>
+                            <li><a href="#">선발현황</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">학생체육대회</a>
+                        <ul class="sub">
+                            <li><a href="/StudentIntro">일정(전체,육상)</a></li>
+                            <li><a href="/StudentPartyEntry">참가신청</a></li>
+                            <li><a href="/StudentPartyGameInwon" id="studentParty">참가현황</a></li>
+                            <li><a href="/StudentGameResult">경기결과</a></li>
+                            <li><a href="/StudentJonghapResult" id="testClick">육상성적</a></li>
+                            @*<li><a href="/StudentJonghapResult" id="testClick">육상성적</a></li>*@
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">경북체력인증</a>
+                        <ul class="sub">
+                            <li><a href="/PhysicalIntro">안내</a></li>
+                            <li><a href="/PhysicalPartyEntry">참가신청</a></li>
+                            <li><a href="/PhysicalPartyInwon">참가현황</a></li>
+                            <li><a href="/PhysicalResult">측정결과</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="login">
+                <a id="member" href="/memberfirst" style="display: none; color: blue;"><span id="memberName"></span></a>
+                <a id="logout" href="/Logout" style="display: none; margin-left: 10px; color: red;">로그아웃</a>
+                <a id="login" href="/login">로그인</a>
+            </div>
+        </div>
+        <div class="hd_bg"></div>
+    </header>
+
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <div class="top_btn"> <a href="#"><img src="../imgs/main/top_btn.png"></a></div>
+    <footer>
+        <div class="container">
+            <div class="top">
+                <img src="../imgs/footer/logo_wide_black.png">
+                <div><a href="#">개인정보처리방침</a></div>
+            </div>
+
+            <div class="text">
+                경북 안동시 풍천면 도청대로 511 (갈전리) 체육건강과 (우)36759 <br>
+                대표전화 : 12-345-7890 ㅣ 팩스 : 12-345-6789<br><br>
+                COPYRIGHT (C) 2023 GYEONGSANGBUK_DO OFFICE OF EDUCATION ALL RIGHTS RESERVED.
+            </div>
+        </div>
+    </footer>
+</body>
+
+<script src="~/_framework/blazor.server.js"></script>
+<script src="~/js/SaveAsFile.js"></script>
+
+<script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
+<script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script> 
+    $(document).ready(function () {
+        $('.menu_btn').click(function () {
+            $('.menu_btn').toggleClass('lijo');
+            $('.gnb').toggleClass('surya');
+        });
+
+        $('.gnb li').click(function () {
+            $(this).find('.sub').slideToggle();
+            var t = $(this).find('.sub');
+            $('.sub').not(t).slideUp();
+        });
+        var max_h = 0;
+        $(".sub").each(function () {
+            var h = parseInt($(this).css("height"));
+            if (max_h < h) {
+                max_h = h;
+            }
+        });
+        // 마우스 over 시
+        $('.gnb').mouseenter(function () {
+            // menu bg
+            var menuHeight = $('#header').outerHeight();
+            $('.hd_bg').css({
+                'top': menuHeight + 'px',
+                height: max_h + 30 + 'px',
+            });
+            $('#header').addClass('open');
+        });
+        $('.gnb').mouseleave(function () {
+            $('.hd_bg').css('height', '0');
+            $('#header').removeClass('open');
+        });
+        $('.gnb > li').mouseenter(function () {
+            $(this).addClass('active');
+            $(this).siblings().removeClass('active')
+        });
+        $('.gnb > li').mouseleave(function () {
+            $(this).removeClass('active');
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    //$(document).ready(function () {
+    //    $(window).scroll(function () {
+    //        var scroll = $(window).scrollTop();
+    //        if (scroll > 1) {
+    //            $("#header").addClass('on');
+    //        }
+    //        else {
+    //            $("#header").removeClass('on');
+    //        }
+    //    })
+    //})
+</script>
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<!-- Initialize Swiper -->
+<script>
+    var swiper = new Swiper(".mySwiper", {
+        spaceBetween: 30,
+        centeredSlides: true,
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        }
+    });
+</script>
+<script>
+    var swiper = new Swiper(".mySwiper2", {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        loop: true,
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        breakpoints: {
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 10,
+            },
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 10,
+            },
+        },
+    });
+</script>
+
+</html>
