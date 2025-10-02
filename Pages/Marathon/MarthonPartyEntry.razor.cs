@@ -691,17 +691,34 @@ namespace GBES.Pages.Marathon
             isEdit = false;
         }
 
-        private void Delete_Clicked(Z_PartyEntry model)
+        private async Task Delete_Clicked(Z_PartyEntry model)
         {
-            model.name = string.Empty;
-            model.schoolName = string.Empty;
-            model.schoolYear = string.Empty;
+            //model.name = string.Empty;
+            //model.schoolName = string.Empty;
+            //model.schoolYear = string.Empty;
 
-            using var context = _contextFactory.CreateDbContext();
-            context.Z_PartyEntries.Update(model);
-            context.SaveChanges();
+            //using var context = _contextFactory.CreateDbContext();
+            //context.Z_PartyEntries.Update(model);
+            //context.SaveChanges();
 
-            isEdit = false;
+            bool confirmed = await JSRuntimeInjector.InvokeAsync<bool>("confirm", model.name + "삭제 할까요?");
+            if (confirmed)
+            {
+                // DB에서 삭제
+                using var context = _contextFactory.CreateDbContext();
+                context.Z_PartyEntries.Remove(model);
+                await context.SaveChangesAsync();
+
+                // 리스트에 삭제 후 새로고침
+                isEdit = false;
+                bool deleteList = listPartyEntry.Remove(model);
+                if (deleteList)
+                {
+                    StateHasChanged();
+                }
+            }
+
+            
         }
 
         private void Cancel_Clicked()

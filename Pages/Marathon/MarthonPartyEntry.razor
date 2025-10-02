@@ -1,7 +1,7 @@
 ﻿@page "/MarthonPartyEntry"
 
 <div class="menu_title subimg2">
-    <h3>2025 교육감배 초·중 구간마라톤대회</h3>
+    <h3>@DateTime.Now.Year.ToString() 교육감배 초·중 구간마라톤대회</h3>
 </div>
 <div class="sub_menu">
     <ul>
@@ -39,10 +39,13 @@ else
                     }
                 </select>
                 <div class="line"></div>
-                @* <button id="addPlayer" class="plus" @onclick="ModalOpenNewPlayer">
-            <div>선수추가</div>
-            <div>+</div>
-            </button> *@
+                @if (isEdit)
+                {
+                    <button id="addPlayer" class="plus" @onclick="ModalOpenNewPlayer">
+                        <div>선수추가</div>
+                        <div>+</div>
+                    </button>
+                }
                 <button id="excelDown" class="excel" @onclick="DownLoadPartyEntry">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
             </div>
         </div>
@@ -58,6 +61,8 @@ else
                             <th>성 명</th>
                             <th>학년</th>
                             <th>성별</th>
+                            <th>생년월일</th>
+                            <th>지도교사</th>
                             <th>비고</th>
                             <th class="@showOrHideClass" style="width:10%"></th>
                         </tr>
@@ -98,6 +103,8 @@ else
                                     </td>
                                 }
                                 <td>@item.part</td>
+                                <td>@item.jumin</td>
+                                <td>@item.special</td>
                                 <td>@item.dNameFive</td>
                                 <td class="@showOrHideClass">
                                     @if (!isEdit)
@@ -106,9 +113,9 @@ else
                                     }
                                     else
                                     {
-                                        <button class="btnSave" @onclick="(()=>Save_Clicked(item))">저장</button>
-                                        <button class="btnDelete" @onclick="(()=>Delete_Clicked(item))" style="margin:auto 5px;">삭제</button>
-                                        <button class="btnCancel" @onclick="(()=>Cancel_Clicked())">취소</button>
+                                        <button class="btnSave" @onclick="(() => Save_Clicked(item))">저장</button>
+                                        <button class="btnDelete" @onclick="(() => Delete_Clicked(item))" style="margin:auto 5px;">삭제</button>
+                                        <button class="btnCancel" @onclick="(() => Cancel_Clicked())">취소</button>
                                     }
                                 </td>
                             </tr>
@@ -189,6 +196,18 @@ else
                     </div>
                 </div>
                 <div class="type">
+                    <div class="title">생년월일</div>
+                    <div class="data">
+                        <input type="text" @bind="model.jumin" />
+                    </div>
+                </div>
+                <div class="type">
+                    <div class="title">지도교사</div>
+                    <div class="data">
+                        <input type="text" @bind="model.special" />
+                    </div>
+                </div>
+                <div class="type">
                     <div class="title">&nbsp;</div>
                     <div class="data">
                         &nbsp;
@@ -237,11 +256,12 @@ else
         font-size: 14px;
         line-height: 16px;
     }
-    .ddlSchName:focus {
-        border: 1px solid #9B51E0;
-        box-sizing: border-box;
-        border-radius: 10px;
-        outline: 3px solid #F8E4FF;
-        border-radius: 10px;
-    }
+
+        .ddlSchName:focus {
+            border: 1px solid #9B51E0;
+            box-sizing: border-box;
+            border-radius: 10px;
+            outline: 3px solid #F8E4FF;
+            border-radius: 10px;
+        }
 </style>

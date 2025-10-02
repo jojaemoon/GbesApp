@@ -74,7 +74,7 @@ namespace GBES.Pages.StudentFestival
 
         List<Z_PartyEntry> listPartyEntry = new List<Z_PartyEntry>();
         //List<LSGameOffice> listOffices = new List<LSGameOffice>();
-        public string year { get; set; } = DateTime.Now.Year.ToString();
+        public string? year { get; set; } = DateTime.Now.Year.ToString();
 
         #endregion
 
@@ -101,6 +101,7 @@ namespace GBES.Pages.StudentFestival
                             .Where(it => it.partyName.Contains("학생체육대회")
                                         && (it.etc == "사용" || it.etc == "마감" || it.etc == "열람" || it.etc == "진행"))
                             .FirstOrDefault();
+                year = pName!.year;
                 partyName = pName.partyName;
                 if (pName.etc == "사용" || memberName == "경북교육청" || memberName == "관리자")
                 {
@@ -116,7 +117,7 @@ namespace GBES.Pages.StudentFestival
                     isDisabledSchool = false;
 
                     listPartyEntry = context.Z_PartyEntries
-                                    .Where(it => it.partyName == partyName)
+                                    .Where(it => it.partyName == partyName && it.year == year)
                                     .OrderBy(it => it.city).ThenBy(it => it.gName).ThenBy(it => it.sName)
                                     .ToList();
                 }
@@ -127,7 +128,7 @@ namespace GBES.Pages.StudentFestival
                     isDisabledSchool = false;
 
                     listPartyEntry = context.Z_PartyEntries
-                                    .Where(it => it.partyName == partyName
+                                    .Where(it => it.partyName == partyName && it.year == year
                                             && it.city == cName)
                                     .OrderBy(it => it.gName).ThenBy(it => it.sName)
                                     .ToList();
@@ -137,7 +138,7 @@ namespace GBES.Pages.StudentFestival
                     isDisabledCity = false;
 
                     listPartyEntry = context.Z_PartyEntries
-                                    .Where(it => it.partyName == partyName
+                                    .Where(it => it.partyName == partyName && it.year == year
                                             && it.gName == memberName)
                                     .OrderBy(it => it.sName).ThenBy(it => it.city)
                                     .ToList();
@@ -149,7 +150,7 @@ namespace GBES.Pages.StudentFestival
                     isDisabledSchool = true;
 
                     listPartyEntry = context.Z_PartyEntries
-                                    .Where(it => it.partyName == partyName
+                                    .Where(it => it.partyName == partyName && it.year == year
                                             && it.schoolName == memberName)
                                     .OrderBy(it => it.city).ThenBy(it => it.gName).ThenBy(it => it.sName)
                                     .ToList();
@@ -182,7 +183,7 @@ namespace GBES.Pages.StudentFestival
             if (cName != "시/군")
             {
                 listPartyEntry = context.Z_PartyEntries
-                                 .Where(it => it.partyName == partyName
+                                 .Where(it => it.partyName == partyName && it.year == year
                                             && it.city == cName)
                                  .OrderBy(it => it.gName).ThenBy(it => it.sName)
                                  .ToList();
@@ -190,7 +191,7 @@ namespace GBES.Pages.StudentFestival
             else
             {
                 listPartyEntry = context.Z_PartyEntries
-                                    .Where(it => it.partyName == partyName)
+                                    .Where(it => it.partyName == partyName && it.year == year)
                                     .OrderBy(it => it.city).ThenBy(it => it.gName).ThenBy(it => it.sName)
                                     .ToList();
             }
@@ -225,7 +226,7 @@ namespace GBES.Pages.StudentFestival
             if (memberName.Contains("학교"))
             {
                 listPartyEntry = context.Z_PartyEntries
-                               .Where(it => it.partyName == partyName
+                               .Where(it => it.partyName == partyName && it.year == year
                                               && it.schoolName == memberName
                                               && it.gName == gName)
                                .OrderBy(it => it.gName).ThenBy(it => it.sName)
@@ -234,7 +235,7 @@ namespace GBES.Pages.StudentFestival
             else if (memberName.Contains("교육지원청") || memberName.Contains("경북교육청") || memberName.Contains("관리자"))
             {
                 listPartyEntry = context.Z_PartyEntries
-                               .Where(it => it.partyName == partyName
+                               .Where(it => it.partyName == partyName && it.year == year
                                               && it.city == cName
                                               && it.gName == gName)
                                .OrderBy(it => it.gName).ThenBy(it => it.sName)
@@ -243,7 +244,7 @@ namespace GBES.Pages.StudentFestival
             else
             {
                 listPartyEntry = context.Z_PartyEntries
-                               .Where(it => it.partyName == partyName
+                               .Where(it => it.partyName == partyName && it.year == year
                                               && it.gName == gName)
                                .OrderBy(it => it.gName).ThenBy(it => it.sName)
                                .ToList();
@@ -263,17 +264,17 @@ namespace GBES.Pages.StudentFestival
             if (memberName.Contains("학교"))
             {
                 listPartyEntry = context.Z_PartyEntries
-                               .Where(it => it.partyName == partyName
+                               .Where(it => it.partyName == partyName && it.year == year
                                               && it.schoolName == memberName
                                               && it.gName == gName
                                         && it.sName == sName)
                                .OrderBy(it => it.gName).ThenBy(it => it.sName)
                                .ToList();
             }
-            else if (memberName.Contains("교육지원청")|| memberName.Contains("경북교육청") || memberName.Contains("관리자"))
+            else if (memberName.Contains("교육지원청") || memberName.Contains("경북교육청") || memberName.Contains("관리자"))
             {
                 listPartyEntry = context.Z_PartyEntries
-                               .Where(it => it.partyName == partyName
+                               .Where(it => it.partyName == partyName && it.year == year
                                               && it.city == cName
                                               && it.gName == gName
                                         && it.sName == sName)
@@ -283,7 +284,7 @@ namespace GBES.Pages.StudentFestival
             else
             {
                 listPartyEntry = context.Z_PartyEntries
-                               .Where(it => it.partyName == partyName
+                               .Where(it => it.partyName == partyName && it.year == year
                                               && it.gName == gName
                                         && it.sName == sName)
                                .OrderBy(it => it.gName).ThenBy(it => it.sName)
@@ -323,7 +324,7 @@ namespace GBES.Pages.StudentFestival
                 isDisabledCity = true;
                 isDisabledSchool = false;
             }
-            else if (memberPart == "경북교육청"|| memberPart == "관리자")
+            else if (memberPart == "경북교육청" || memberPart == "관리자")
             {
                 schoolNameList.Add("경북체육중학교");
                 schoolNameList.Add("경북체육고등학교");
@@ -348,6 +349,12 @@ namespace GBES.Pages.StudentFestival
             if (!isGameUsing)
             {
                 await JSRuntimeInjector.InvokeVoidAsync("alert", model.gName + " 참가신청이 마감되었습니다.");
+                return;
+            }
+
+            if(cName == null)
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "시군을 선택후 수정하세요.");
                 return;
             }
 
@@ -462,32 +469,68 @@ namespace GBES.Pages.StudentFestival
             }
             CancelModel();
         }
+        //public async Task DeleteModel()
+        //{
+        //    if (!isGameUsing)
+        //    {
+        //        await JSRuntimeInjector.InvokeVoidAsync("alert", model.gName + " 참가신청이 마감되었습니다.");
+        //        return;
+        //    }
+
+        //    bool confirmed = await JSRuntimeInjector.InvokeAsync<bool>("confirm", model.name + "삭제 할까요?");
+        //    if (confirmed)
+        //    {
+        //        // DB에서 삭제
+        //        using var context = _contextFactory.CreateDbContext();
+        //        context.Z_PartyEntries.Remove(model);
+        //        await context.SaveChangesAsync();
+
+        //        // 리스트에 삭제 후 새로고침
+        //        bool deleteList = listPartyEntry.Remove(model);
+        //        if (deleteList)
+        //        {
+        //            StateHasChanged();
+        //        }
+
+        //        await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
+        //    }
+        //}
         public async Task DeleteModel()
         {
             if (!isGameUsing)
             {
-                await JSRuntimeInjector.InvokeVoidAsync("alert", model.gName + " 참가신청이 마감되었습니다.");
+                if (JSRuntimeInjector != null && model != null)
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", model.gName + " 참가신청이 마감되었습니다.");
                 return;
             }
+
+            if (JSRuntimeInjector == null || model == null)
+                return;
 
             bool confirmed = await JSRuntimeInjector.InvokeAsync<bool>("confirm", model.name + "삭제 할까요?");
             if (confirmed)
             {
-                // DB에서 삭제
+                if (_contextFactory == null)
+                    return;
+
                 using var context = _contextFactory.CreateDbContext();
                 context.Z_PartyEntries.Remove(model);
                 await context.SaveChangesAsync();
 
-                // 리스트에 삭제 후 새로고침
-                bool deleteList = listPartyEntry.Remove(model);
-                if (deleteList)
+                if (listPartyEntry != null)
                 {
-                    StateHasChanged();
+                    bool deleteList = listPartyEntry.Remove(model);
+                    if (deleteList)
+                    {
+                        StateHasChanged();
+                    }
                 }
 
                 await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
             }
         }
+
+
         public async Task CancelModel()
         {
             model = new Z_PartyEntry();
@@ -730,7 +773,7 @@ namespace GBES.Pages.StudentFestival
         // 참가신청 다운로드
         public async Task DownLoadPartyEntry()
         {
-            if (gName == "종목선택" || gName==null)
+            if (gName == "종목선택" || gName == null)
             {
                 await JSRuntimeInjector.InvokeVoidAsync("alert", "종목을 선택한 후 다운 받으세요.");
                 return;
@@ -746,7 +789,7 @@ namespace GBES.Pages.StudentFestival
             if (memberPart == "교육지원청")
             {
                 excelPartyEntry = context.Z_PartyEntries
-                            .Where(it => it.partyName == partyName
+                            .Where(it => it.partyName == partyName && it.year == year
                                        && it.city == cName)
                             .OrderBy(it => it.gName).ThenBy(it => it.sName)
                             .ToList();
@@ -769,7 +812,7 @@ namespace GBES.Pages.StudentFestival
             else if (memberPart == "경기단체")
             {
                 excelPartyEntry = context.Z_PartyEntries
-                            .Where(it => it.partyName == partyName
+                            .Where(it => it.partyName == partyName && it.year == year
                                        && it.gName == memberName)
                             .OrderBy(it => it.sName).ThenBy(it => it.city)
                             .ToList();
@@ -788,7 +831,7 @@ namespace GBES.Pages.StudentFestival
             else if (memberPart == "경북교육청" || memberPart == "관리자")
             {
                 excelPartyEntry = context.Z_PartyEntries
-                            .Where(it => it.partyName == partyName)
+                            .Where(it => it.partyName == partyName && it.year == year)
                             .OrderBy(it => it.city).ThenBy(it => it.gName).ThenBy(it => it.sName)
                             .ToList();
                 excelFileName = "학생체전";
@@ -797,7 +840,7 @@ namespace GBES.Pages.StudentFestival
             else if (memberPart == "학교")
             {
                 excelPartyEntry = context.Z_PartyEntries
-                            .Where(it => it.partyName == partyName
+                            .Where(it => it.partyName == partyName && it.year == year
                                             && it.schoolName == memberName)
                             .OrderBy(it => it.city).ThenBy(it => it.gName).ThenBy(it => it.sName)
                             .ToList();

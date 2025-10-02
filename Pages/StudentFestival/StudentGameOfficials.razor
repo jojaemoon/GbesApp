@@ -35,7 +35,7 @@ else
 {
     <div id="search">
         <div class="wrap">
-            <h2>2023 경북학생체육대회 경기임원 기간 할애 목록 <span class="red" style="margin-left: 50px;">대상자 @listGameOfficer.Count<span>명</span></span></h2>
+            <h2>@DateTime.Now.Year.ToString() 경북학생체육대회 경기임원 기간 할애 목록 <span class="red" style="margin-left: 50px;">대상자 @listGameOfficer.Count<span>명</span></span></h2>
             <div class="filter">
                 <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
                 <select value="@gName" @onchange="SelectGameName">
