@@ -12,6 +12,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Security.Claims;
 
+
 namespace GBES.Pages.StudentFestival
 {
     public partial class StudentPartyEntry
@@ -221,6 +222,10 @@ namespace GBES.Pages.StudentFestival
             else if (gameEnd == "사용")
             {
                 isGameUsing = true;
+            }
+            else
+            {
+                isGameUsing = false;
             }
 
             if (memberName.Contains("학교"))
@@ -513,8 +518,13 @@ namespace GBES.Pages.StudentFestival
                 if (_contextFactory == null)
                     return;
 
-                using var context = _contextFactory.CreateDbContext();
-                context.Z_PartyEntries.Remove(model);
+                //using var context = _contextFactory.CreateDbContext();
+                //context.Z_PartyEntries.Remove(model);
+                //await context.SaveChangesAsync();
+
+                using var context = await _contextFactory.CreateDbContextAsync();
+                context.Attach(model);
+                context.Entry(model).State = EntityState.Deleted;
                 await context.SaveChangesAsync();
 
                 if (listPartyEntry != null)
@@ -773,12 +783,7 @@ namespace GBES.Pages.StudentFestival
         // 참가신청 다운로드
         public async Task DownLoadPartyEntry()
         {
-            if (gName == "종목선택" || gName == null)
-            {
-                await JSRuntimeInjector.InvokeVoidAsync("alert", "종목을 선택한 후 다운 받으세요.");
-                return;
-
-            }
+            
             string excelFileName = "";
             string title = "";
 
@@ -788,6 +793,12 @@ namespace GBES.Pages.StudentFestival
 
             if (memberPart == "교육지원청")
             {
+                if (gName == "종목선택" || gName == null)
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "종목을 선택한 후 다운 받으세요.");
+                return;
+
+            }
                 excelPartyEntry = context.Z_PartyEntries
                             .Where(it => it.partyName == partyName && it.year == year
                                        && it.city == cName)
@@ -846,12 +857,12 @@ namespace GBES.Pages.StudentFestival
                             .ToList();
                 excelFileName = memberName;
 
-                if (gName != "종목선택")
+                if (!string.IsNullOrEmpty(gName) && gName != "종목선택")
                 {
                     title = gName;
                     excelPartyEntry = excelPartyEntry.Where(it => it.gName == gName).ToList();
 
-                    if (sName != "종별선택")
+                    if (!string.IsNullOrEmpty(sName) && sName != "종별선택")
                     {
                         title += " " + sName + " ";
                         excelPartyEntry = excelPartyEntry.Where(it => it.sName == sName).ToList();
@@ -1074,6 +1085,10 @@ namespace GBES.Pages.StudentFestival
         private Person person;
         private int progressPercent;
 
+        // 0.5MB 한도
+        const long OneMB = 1L * 1024 * 1024;
+        const long HalfMB = OneMB / 2; // 524,288
+
         public void Dispose()
         {
             cancelation.Cancel();
@@ -1086,160 +1101,368 @@ namespace GBES.Pages.StudentFestival
             public IBrowserFile[] Picture { get; set; }
         }
 
+        // 파일 선택 시: PDF만 받으므로 단순히 배열만 보관
         private async Task OnChangeOne(InputFileChangeEventArgs e)
         {
-            person.Picture = e.GetMultipleFiles().ToArray();
-
-            var format = "image/png";
-            Total = e.GetMultipleFiles().Count();
-            foreach (var imageFile in e.GetMultipleFiles())
+            var files = e.GetMultipleFiles()?.ToArray() ?? Array.Empty<IBrowserFile>();
+            if (files.Length == 0)
             {
-                var resizedImageFile = await imageFile.RequestImageFileAsync(format, 100, 100);
-                var buffer = new byte[resizedImageFile.Size];
-                await resizedImageFile.OpenReadStream().ReadAsync(buffer);
-                var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-                imageDataUrls.Add(imageDataUrl);
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "파일이 선택되지 않았습니다.");
+                return;
             }
-            editContext.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
+
+            person.Picture = files;
+            Total = files.Length;
+
+            // 화면 갱신용(필드 변경 통지)
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
         }
 
         private async Task OnSubmitOne()
         {
-            string filename = "";
-            for (int i = 0; i < Total; i++)
+            if (person?.Picture == null || person.Picture.Length == 0)
             {
-                //string  filename = year + "_" + person.Picture[i].Name;
-                string[] arr = person.Picture[i].Name.Split('.');
-                filename = year + "_학폭확인서_" + cName + "_" + ShortName(modalSelectSchool) + "_" + model.name + "." + arr[1];
-                var path = $"{env.WebRootPath}\\Upload\\{filename}";
-                using var file = File.OpenWrite(path);
-                using var stream = person.Picture[i].OpenReadStream(968435456);
-
-                var buffer = new byte[4 * 1096];
-                int bytesRead;
-                double totalRead = 0;
-
-                displayProgress = true;
-
-                while ((bytesRead = await stream.ReadAsync(buffer, cancelation.Token)) != 0)
-                {
-                    totalRead += bytesRead;
-                    await file.WriteAsync(buffer, cancelation.Token);
-
-                    progressPercent = (int)((totalRead / person.Picture[i].Size) * 100);
-                    StateHasChanged();
-                }
-
-                displayProgress = false;
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "업로드할 파일이 없습니다.");
+                return;
             }
 
-            await JSRuntimeInjector.InvokeVoidAsync("alert", "파일을 저장하였습니다");
+            string lastSavedFileName = "";
 
-            model.specialOne = filename;
+            for (int i = 0; i < person.Picture.Length; i++)
+            {
+                var file = person.Picture[i];
+
+                // 1) 기본 체크: 0바이트 / 크기 초과(0.5MB)
+                if (file.Size <= 0)
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "파일이 비어 있습니다.");
+                    return;
+                }
+                if (file.Size > HalfMB) // HalfMB = 524,288
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "파일 용량이 너무 큽니다. 0.5MB(512KB) 이하만 업로드할 수 있습니다.");
+                    return;
+                }
+
+                // 2) 확장자 1차 검사
+                var ext = System.IO.Path.GetExtension(file.Name).ToLowerInvariant();
+                if (ext != ".pdf")
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "PDF(.pdf) 파일만 업로드할 수 있습니다.");
+                    return;
+                }
+
+                //// 3) 시그니처 2차 검사: %PDF-
+                //if (!await IsPdfAsync(file))  // 아래 헬퍼 메서드 참고
+                //{
+                //    await JSRuntimeInjector.InvokeVoidAsync("alert", "PDF 파일 형식이 아닙니다. 파일을 확인해 주세요.");
+                //    return;
+                //}
+
+                // 4) 저장 경로/파일명
+                var uploadDir = System.IO.Path.Combine(env.WebRootPath ?? env.ContentRootPath, "Upload");
+                Directory.CreateDirectory(uploadDir);
+
+                var safeCName = cName.Replace(System.IO.Path.DirectorySeparatorChar, '_')
+                                     .Replace(System.IO.Path.AltDirectorySeparatorChar, '_');
+
+                var baseName = $"{year}_학폭확인서_{safeCName}_{ShortName(modalSelectSchool)}_{model.name}";
+                var filename = $"{baseName}_{Guid.NewGuid():N}.pdf";
+
+                var tmpPath = System.IO.Path.Combine(uploadDir, filename + ".part");
+                var finalPath = System.IO.Path.Combine(uploadDir, filename);
+
+                // 5) 스트리밍 저장 (읽은 만큼만 쓰기)
+                const int BufferSize = 81920;
+                long written = 0;
+
+                await using (var read = file.OpenReadStream(maxAllowedSize: HalfMB))
+                await using (var write = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, useAsync: true))
+                {
+                    var buffer = new byte[BufferSize];
+                    int bytesRead;
+                    double totalRead = 0;
+                    displayProgress = true;
+
+                    while ((bytesRead = await read.ReadAsync(buffer.AsMemory(0, BufferSize))) > 0)
+                    {
+                        await write.WriteAsync(buffer.AsMemory(0, bytesRead));
+                        totalRead += bytesRead;
+
+                        progressPercent = (int)((totalRead / (double)file.Size) * 100);
+                        StateHasChanged();
+                    }
+
+                    await write.FlushAsync();
+                    written = write.Length;
+                    displayProgress = false;
+                }
+
+                // 6) 무결성 확인 (쓴 바이트 == 원본 크기)
+                if (written != file.Size)
+                {
+                    if (System.IO.File.Exists(tmpPath)) System.IO.File.Delete(tmpPath);
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "전송이 중간에 끊겼습니다. 다시 시도해 주세요.");
+                    return;
+                }
+
+                // 7) 원자적 이동 (.part → .pdf)
+                System.IO.File.Move(tmpPath, finalPath);
+
+                lastSavedFileName = filename;
+            }
+
+            await JSRuntimeInjector.InvokeVoidAsync("alert", "파일을 저장하였습니다.");
+            model.specialOne = lastSavedFileName;   // 여러 개면 리스트로 관리 권장
         }
+
+        /// <summary>앞 5바이트로 PDF 시그니처(%PDF-) 확인</summary>
+        //private static async Task<bool> IsPdfAsync(IBrowserFile f)
+        //{
+        //    try
+        //    {
+        //        await using var s = f.OpenReadStream(1024);
+        //        Span<byte> header = stackalloc byte[5];
+        //        var n = await s.ReadAsync(header);
+        //        return n >= 5 &&
+        //               header[0] == 0x25 && // %
+        //               header[1] == 0x50 && // P
+        //               header[2] == 0x44 && // D
+        //               header[3] == 0x46 && // F
+        //               header[4] == 0x2D;   // -
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
 
         private async Task OnChangeTwo(InputFileChangeEventArgs e)
         {
-            person.Picture = e.GetMultipleFiles().ToArray();
-
-            var format = "image/png";
-            Total = e.GetMultipleFiles().Count();
-            foreach (var imageFile in e.GetMultipleFiles())
+            var files = e.GetMultipleFiles()?.ToArray() ?? Array.Empty<IBrowserFile>();
+            if (files.Length == 0)
             {
-                var resizedImageFile = await imageFile.RequestImageFileAsync(format, 100, 100);
-                var buffer = new byte[resizedImageFile.Size];
-                await resizedImageFile.OpenReadStream().ReadAsync(buffer);
-                var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-                imageDataUrls.Add(imageDataUrl);
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "파일이 선택되지 않았습니다.");
+                return;
             }
-            editContext.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
+
+            person.Picture = files;
+            Total = files.Length;
+
+            // 화면 갱신용(필드 변경 통지)
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
         }
 
         private async Task OnSubmitTwo()
         {
-            string filename = "";
-            for (int i = 0; i < Total; i++)
+            if (person?.Picture == null || person.Picture.Length == 0)
             {
-                //string  filename = year + "_" + person.Picture[i].Name;
-                string[] arr = person.Picture[i].Name.Split('.');
-                filename = year + "_학교장확인서_" + cName + "_" + ShortName(modalSelectSchool) + "_" + model.name + "." + arr[1];
-                var path = $"{env.WebRootPath}\\Upload\\{filename}";
-                using var file = File.OpenWrite(path);
-                using var stream = person.Picture[i].OpenReadStream(968435456);
-
-                var buffer = new byte[4 * 1096];
-                int bytesRead;
-                double totalRead = 0;
-
-                displayProgress = true;
-
-                while ((bytesRead = await stream.ReadAsync(buffer, cancelation.Token)) != 0)
-                {
-                    totalRead += bytesRead;
-                    await file.WriteAsync(buffer, cancelation.Token);
-
-                    progressPercent = (int)((totalRead / person.Picture[i].Size) * 100);
-                    StateHasChanged();
-                }
-
-                displayProgress = false;
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "업로드할 파일이 없습니다.");
+                return;
             }
 
-            await JSRuntimeInjector.InvokeVoidAsync("alert", "파일을 저장하였습니다");
+            string lastSavedFileName = "";
 
-            model.specialTwo = filename;
+            for (int i = 0; i < person.Picture.Length; i++)
+            {
+                var file = person.Picture[i];
+
+                // 1) 기본 체크: 0바이트 / 크기 초과(0.5MB)
+                if (file.Size <= 0)
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "파일이 비어 있습니다.");
+                    return;
+                }
+                if (file.Size > HalfMB) // HalfMB = 524,288
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "파일 용량이 너무 큽니다. 0.5MB(512KB) 이하만 업로드할 수 있습니다.");
+                    return;
+                }
+
+                // 2) 확장자 1차 검사
+                var ext = System.IO.Path.GetExtension(file.Name).ToLowerInvariant();
+                if (ext != ".pdf")
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "PDF(.pdf) 파일만 업로드할 수 있습니다.");
+                    return;
+                }
+
+                //// 3) 시그니처 2차 검사: %PDF-
+                //if (!await IsPdfAsync(file))  // 아래 헬퍼 메서드 참고
+                //{
+                //    await JSRuntimeInjector.InvokeVoidAsync("alert", "PDF 파일 형식이 아닙니다. 파일을 확인해 주세요.");
+                //    return;
+                //}
+
+                // 4) 저장 경로/파일명
+                var uploadDir = System.IO.Path.Combine(env.WebRootPath ?? env.ContentRootPath, "Upload");
+                Directory.CreateDirectory(uploadDir);
+
+                var safeCName = cName.Replace(System.IO.Path.DirectorySeparatorChar, '_')
+                                     .Replace(System.IO.Path.AltDirectorySeparatorChar, '_');
+
+                var baseName = $"{year}_학교장확인서_{safeCName}_{ShortName(modalSelectSchool)}_{model.name}";
+                var filename = $"{baseName}_{Guid.NewGuid():N}.pdf";
+
+                var tmpPath = System.IO.Path.Combine(uploadDir, filename + ".part");
+                var finalPath = System.IO.Path.Combine(uploadDir, filename);
+
+                // 5) 스트리밍 저장 (읽은 만큼만 쓰기)
+                const int BufferSize = 81920;
+                long written = 0;
+
+                await using (var read = file.OpenReadStream(maxAllowedSize: HalfMB))
+                await using (var write = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, useAsync: true))
+                {
+                    var buffer = new byte[BufferSize];
+                    int bytesRead;
+                    double totalRead = 0;
+                    displayProgress = true;
+
+                    while ((bytesRead = await read.ReadAsync(buffer.AsMemory(0, BufferSize))) > 0)
+                    {
+                        await write.WriteAsync(buffer.AsMemory(0, bytesRead));
+                        totalRead += bytesRead;
+
+                        progressPercent = (int)((totalRead / (double)file.Size) * 100);
+                        StateHasChanged();
+                    }
+
+                    await write.FlushAsync();
+                    written = write.Length;
+                    displayProgress = false;
+                }
+
+                // 6) 무결성 확인 (쓴 바이트 == 원본 크기)
+                if (written != file.Size)
+                {
+                    if (System.IO.File.Exists(tmpPath)) System.IO.File.Delete(tmpPath);
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "전송이 중간에 끊겼습니다. 다시 시도해 주세요.");
+                    return;
+                }
+
+                // 7) 원자적 이동 (.part → .pdf)
+                System.IO.File.Move(tmpPath, finalPath);
+
+                lastSavedFileName = filename;
+            }
+
+            await JSRuntimeInjector.InvokeVoidAsync("alert", "파일을 저장하였습니다.");
+            model.specialTwo = lastSavedFileName;   // 여러 개면 리스트로 관리 권장
         }
 
         private async Task OnChangeThree(InputFileChangeEventArgs e)
         {
-            person.Picture = e.GetMultipleFiles().ToArray();
-
-            var format = "image/png";
-            Total = e.GetMultipleFiles().Count();
-            foreach (var imageFile in e.GetMultipleFiles())
+            var files = e.GetMultipleFiles()?.ToArray() ?? Array.Empty<IBrowserFile>();
+            if (files.Length == 0)
             {
-                var resizedImageFile = await imageFile.RequestImageFileAsync(format, 100, 100);
-                var buffer = new byte[resizedImageFile.Size];
-                await resizedImageFile.OpenReadStream().ReadAsync(buffer);
-                var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-                imageDataUrls.Add(imageDataUrl);
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "파일이 선택되지 않았습니다.");
+                return;
             }
-            editContext.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
+
+            person.Picture = files;
+            Total = files.Length;
+
+            // 화면 갱신용(필드 변경 통지)
+            editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
         }
 
         private async Task OnSubmitThree()
         {
-            string filename = "";
-            for (int i = 0; i < Total; i++)
+            if (person?.Picture == null || person.Picture.Length == 0)
             {
-                //string  filename = year + "_" + person.Picture[i].Name;
-                string[] arr = person.Picture[i].Name.Split('.');
-                filename = year + "_입학확인서_" + cName + "_" + ShortName(modalSelectSchool) + "_" + model.name + "." + arr[1];
-                var path = $"{env.WebRootPath}\\Upload\\{filename}";
-                using var file = File.OpenWrite(path);
-                using var stream = person.Picture[i].OpenReadStream(968435456);
-
-                var buffer = new byte[4 * 1096];
-                int bytesRead;
-                double totalRead = 0;
-
-                displayProgress = true;
-
-                while ((bytesRead = await stream.ReadAsync(buffer, cancelation.Token)) != 0)
-                {
-                    totalRead += bytesRead;
-                    await file.WriteAsync(buffer, cancelation.Token);
-
-                    progressPercent = (int)((totalRead / person.Picture[i].Size) * 100);
-                    StateHasChanged();
-                }
-
-                displayProgress = false;
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "업로드할 파일이 없습니다.");
+                return;
             }
 
-            await JSRuntimeInjector.InvokeVoidAsync("alert", "파일을 저장하였습니다");
+            string lastSavedFileName = "";
 
-            model.specialThree = filename;
+            for (int i = 0; i < person.Picture.Length; i++)
+            {
+                var file = person.Picture[i];
+
+                // 1) 기본 체크: 0바이트 / 크기 초과(0.5MB)
+                if (file.Size <= 0)
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "파일이 비어 있습니다.");
+                    return;
+                }
+                if (file.Size > HalfMB) // HalfMB = 524,288
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "파일 용량이 너무 큽니다. 0.5MB(512KB) 이하만 업로드할 수 있습니다.");
+                    return;
+                }
+
+                // 2) 확장자 1차 검사
+                var ext = System.IO.Path.GetExtension(file.Name).ToLowerInvariant();
+                if (ext != ".pdf")
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "PDF(.pdf) 파일만 업로드할 수 있습니다.");
+                    return;
+                }
+
+                //// 3) 시그니처 2차 검사: %PDF-
+                //if (!await IsPdfAsync(file))  // 아래 헬퍼 메서드 참고
+                //{
+                //    await JSRuntimeInjector.InvokeVoidAsync("alert", "PDF 파일 형식이 아닙니다. 파일을 확인해 주세요.");
+                //    return;
+                //}
+
+                // 4) 저장 경로/파일명
+                var uploadDir = System.IO.Path.Combine(env.WebRootPath ?? env.ContentRootPath, "Upload");
+                Directory.CreateDirectory(uploadDir);
+
+                var safeCName = cName.Replace(System.IO.Path.DirectorySeparatorChar, '_')
+                                     .Replace(System.IO.Path.AltDirectorySeparatorChar, '_');
+
+                var baseName = $"{year}_입학확인서_{safeCName}_{ShortName(modalSelectSchool)}_{model.name}";
+                var filename = $"{baseName}_{Guid.NewGuid():N}.pdf";
+
+                var tmpPath = System.IO.Path.Combine(uploadDir, filename + ".part");
+                var finalPath = System.IO.Path.Combine(uploadDir, filename);
+
+                // 5) 스트리밍 저장 (읽은 만큼만 쓰기)
+                const int BufferSize = 81920;
+                long written = 0;
+
+                await using (var read = file.OpenReadStream(maxAllowedSize: HalfMB))
+                await using (var write = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, useAsync: true))
+                {
+                    var buffer = new byte[BufferSize];
+                    int bytesRead;
+                    double totalRead = 0;
+                    displayProgress = true;
+
+                    while ((bytesRead = await read.ReadAsync(buffer.AsMemory(0, BufferSize))) > 0)
+                    {
+                        await write.WriteAsync(buffer.AsMemory(0, bytesRead));
+                        totalRead += bytesRead;
+
+                        progressPercent = (int)((totalRead / (double)file.Size) * 100);
+                        StateHasChanged();
+                    }
+
+                    await write.FlushAsync();
+                    written = write.Length;
+                    displayProgress = false;
+                }
+
+                // 6) 무결성 확인 (쓴 바이트 == 원본 크기)
+                if (written != file.Size)
+                {
+                    if (System.IO.File.Exists(tmpPath)) System.IO.File.Delete(tmpPath);
+                    await JSRuntimeInjector.InvokeVoidAsync("alert", "전송이 중간에 끊겼습니다. 다시 시도해 주세요.");
+                    return;
+                }
+
+                // 7) 원자적 이동 (.part → .pdf)
+                System.IO.File.Move(tmpPath, finalPath);
+
+                lastSavedFileName = filename;
+            }
+
+            await JSRuntimeInjector.InvokeVoidAsync("alert", "파일을 저장하였습니다.");
+            model.specialThree = lastSavedFileName;   // 여러 개면 리스트로 관리 권장
         }
 
         private string ShortName(string? modalSelectSchool)

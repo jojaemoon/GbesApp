@@ -1,7 +1,7 @@
 ﻿@page "/StudentGamePartyEnd"
 
 <div class="menu_title subimg3">
-    <h3>경상북도소년체육대회</h3>
+    <h3>@partyName</h3>
 </div>
 <div class="sub_menu">
     <ul>
@@ -9,25 +9,28 @@
         {
             <li><a href="/MemberFirst">로그인정보</a></li>
         }
-        <li><a href="/BoyIntro" class="dropdown-item">대회요강</a></li>
-        <li><a href="/BoyPartyEntry" class="dropdown-item">참가신청</a></li>
-        <li><a href="/BoyCityInwon" class="dropdown-item">참가현황</a></li>
-        <li><a href="/BoyGameResult" class="dropdown-item">경기결과</a></li>
-        @*  <li><a href="/BoySelection" class="dropdown-item">선발현황</a></li> *@
+        <li><a href="/StudentIntro">대회일정</a></li>
+        @if (!string.IsNullOrEmpty(memberName))
+        {
+            <li><a href="/StudentPartyEntry">참가신청</a></li>
+        }
+        <li class="on"><a href="/StudentCityInwon">참가현황</a></li>
+        <li><a href="/StudentGameResult">경기결과</a></li>
+        <li><a href="/StudentJonghapResult">육상성적</a></li>
         @if (memberPart == "경기단체" || memberPart == "교육지원청" || memberPart == "경북교육청" || memberPart == "관리자")
         {
-            <li><a href="/BoyGameOfficials">시간할애</a></li>
+            <li><a href="/StudentGameOfficials">시간할애</a></li>
         }
         @if (memberPart == "경북교육청" || memberPart == "관리자")
         {
-            <li><a href="/BoyGamePartyEnd">마감처리</a></li>
+            <li><a href="/StudentGamePartyEnd">마감처리</a></li>
         }
     </ul>
 </div>
 
 <div id="search">
     <div class="wrap">
-        <h2>@year 경북소년체육대회 마감처리 </h2>
+        <h2>@year 경상북도학생체육대회 마감처리 </h2>
         <div class="filter">
         </div>
     </div>

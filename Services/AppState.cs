@@ -109,6 +109,7 @@ namespace GBES.Services
         {
             List<string?> list = _context.Z_Details
                                  .Where(it => it.partyName.Contains(partyName)
+                                                && it.year== GetYear
                                                 && it.year == GetYear
                                                 && it.gName == gname
                                                 && it.sName == sname)
@@ -123,6 +124,7 @@ namespace GBES.Services
         {
             List<Z_PartyEntry> list = _context.Z_PartyEntries
                                  .Where(it => it.partyName == partyName
+                                                && it.year == GetYear
                                                 && it.gName == gName
                                                 && it.sName == sName
                                                 && (it.dNameOne == dName || it.dNameTwo == dName

@@ -3,10 +3,26 @@ using GBES.Managers;
 using GBES.Models;
 using GBES.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+
+// 1MB
+const long OneMB = 1L * 1024 * 1024; // 1,048,576
+
+// 0.5MB (1/2로 줄이기)
+const long HalfMB = OneMB / 2;       // 524,288
+// 또는
+//const long HalfMB2 = 512L * 1024L;   // 524,288
+// 또는
+//const long HalfMB3 = 1L * 1024 * 1024 / 2;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = HalfMB);
+builder.Services.AddServerSideBlazor().AddHubOptions(o => o.MaximumReceiveMessageSize = HalfMB);
+builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = HalfMB);
 
 // [START] GWSportsAll 
 // Add services to the container.

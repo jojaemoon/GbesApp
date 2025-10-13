@@ -318,30 +318,62 @@ else
 
                 <ul id="down">
                     <li>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="inputPassword6" class="col-form-label">학폭확인서 : <span class="fileInfo">@IsFile(model.specialOne)</span></label>
-                            </div>
-                            <div class="col-md-7"><InputFile @key=@(inputFileId) multiple OnChange="OnChangeOne" class="form-control" /></div>
-                            <div class="col-md-2"><button type="button" class="btn btn-primary" @onclick="OnSubmitOne">파일올리기</button></div>
+                        <div class="row" style="color: red; font-weight: 600;">
+                            PDF파일만 업로드 할 수 있습니다. (용량 500kb 이하)
                         </div>
                     </li>
                     <li>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="inputPassword6" class="col-form-label">학교장확인서 : <span class="fileInfo">@IsFile(model.specialTwo)</span></label>
+                                <label class="col-form-label">
+                                    학폭확인서 : <span class="fileInfo">@IsFile(model.specialOne)</span>
+                                </label>
                             </div>
-                            <div class="col-md-7"><InputFile @key=@(inputFileId) multiple OnChange="OnChangeTwo" class="form-control" /></div>
-                            <div class="col-md-2"><button type="button" class="btn btn-primary" @onclick="OnSubmitTwo">파일올리기</button></div>
+                            <div class="col-md-7">
+                                <InputFile @key=@(inputFileId)
+                                           OnChange="OnChangeOne"
+                                           accept=".pdf,application/pdf"
+                                           class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary" @onclick="OnSubmitOne">파일올리기</button>
+                            </div>
                         </div>
                     </li>
                     <li>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="inputPassword6" class="col-form-label">입학확인서 : <span class="fileInfo">@IsFile(model.specialThree)</span></label>
+                                <label class="col-form-label">
+                                    학교장확인서 : <span class="fileInfo">@IsFile(model.specialTwo)</span>
+                                </label>
                             </div>
-                            <div class="col-md-7"><InputFile @key=@(inputFileId) multiple OnChange="OnChangeThree" class="form-control" /></div>
-                            <div class="col-md-2"><button type="button" class="btn btn-primary" @onclick="OnSubmitThree">파일올리기</button></div>
+                            <div class="col-md-7">
+                                <InputFile @key=@(inputFileId)
+                                           OnChange="OnChangeTwo"
+                                           accept=".pdf,application/pdf"
+                                           class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary" @onclick="OnSubmitTwo">파일올리기</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="col-form-label">
+                                    입학확인서 : <span class="fileInfo">@IsFile(model.specialThree)</span>
+                                </label>
+                            </div>
+                            <div class="col-md-7">
+                                <InputFile @key=@(inputFileId)
+                                           OnChange="OnChangeThree"
+                                           accept=".pdf,application/pdf"
+                                           class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary" @onclick="OnSubmitThree">파일올리기</button>
+                            </div>
                         </div>
                     </li>
                     <li>파일명에 특수문자 및 띄어쓰기 없는 파일만 저장됩니다.<br /> (학폭1, 학교장1, 입학1)</li>

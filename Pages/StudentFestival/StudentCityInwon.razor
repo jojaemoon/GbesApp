@@ -1,9 +1,9 @@
 ﻿@page "/StudentCityInwon"
 
-<div class="menu_title subimg3">
+<div class="menu_title subimg3 no-print">
     <h3>경상북도학생체육대회</h3>
 </div>
-<div class="sub_menu">
+<div class="sub_menu no-print">
     <ul>
         @if (!string.IsNullOrEmpty(memberName))
         {
@@ -30,16 +30,29 @@
 
 <div id="search">
     <div class="data_list">
-        <div>
-            <h>
-                경상북도 학생체육대회 시군별 참가선수 현황
+        @* <div>
+            <h4>
+                @memberName 경상북도 학생체육대회 시군별 참가선수 현황
                 <span class="goBtn">
-                    <a href="/StudentPartyGameInwon">종목별 참가현황 가기 >></a>
+                    <a class="btn btn-success" href="/StudentPartyGameInwon">종목별 참가현황 가기 >></a>
                 </span>
-                <br />
-                @memberName
-                <br />
-            </h>
+            </h4>
+        </div> *@
+        <div class="wrap">
+            <div class="filter">
+                <h2 id="partyname" style="display: none;"><span style="font-weight: bold;">@partyName</span></h2>
+                <h2><span style="font-weight: bold;">@memberName</span> 시군별 참가선수 현황</h2>
+                <div class="line"></div>
+                <button type="button" class="btn btn-danger d-flex align-items-center no-print" @onclick="GoToGameInwon">
+                    <div>종목별현황보기</div>
+                    <div>>></div>
+                </button>
+                <button type="button" id="addPlayer" class="plus no-print" @onclick="PrintPage">
+                    <div>인쇄</div>
+                    <div><img src="../imgs/sub/printer.png"></div>
+                </button>
+                <button type="button" id="excelDown" class="excel no-print" @onclick="DownLoadExcel">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
+            </div>
         </div>
         <div>
             <table class="table table--block" cellspacing="0" cellpadding="0">
@@ -187,6 +200,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .filter .goBtn {
+            background-color: deeppink;
+            color: #fff;
         }
 
         .filter .plus {
@@ -523,7 +541,7 @@
         height: 40px;
         /*border-bottom: solid #aaaaaa 1px; */
         /* padding-bottom: 10px;
-                                    padding-left: 10px; */
+                                                                            padding-left: 10px; */
         /* position: relative; */
         background: none;
         z-index: 5;
@@ -548,13 +566,107 @@
             width: 100%;
         }
 
-    .goBtn {
-        margin-left: 50px;
-        font-size: 16px;
-        color: white;
-        background: #fa5a5a;
-        padding: 5px;
-        border-radius: 12px;
+    .btn-danger {
+        background-color: #d63031; /* 원하는 붉은 계열 */
+        border-color: #c0392b;
+    }
+
+        .btn-danger:hover {
+            background-color: #e74c3c;
+        }
+
+    @@media print {
+        /* 페이지 여백도 최소화 */
+        @@page {
+            margin: 5mm;
+        }
+
+        table.table {
+            transform: scale(0.7);
+            transform-origin: top left;
+            width: 100%;
+            display: block; /* 필요 시 블록 디스플레이로 변경 */
+        }
+
+        table.table, table.table--block {
+            table-layout: fixed !important;
+        }
+
+
+        table.table th,
+        table.table td {
+            all: unset;
+            display: table-cell;
+            padding: 4px 2px;
+            border: 1px solid #000;
+            font-size: 11px;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        /* 테이블 기본값 초기화 */
+        table.table, table.table--block {
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            table-layout: fixed !important;
+        }
+            /* Bootstrap padding 강제 덮어쓰기 */
+            table.table th,
+            table.table td {
+                padding: 4px 2px !important; /* 인쇄용 최소 여백 */
+                margin: 0 !important;
+                border: 1px solid #000 !important;
+                font-size: 11px !important;
+                line-height: 1.1 !important;
+                background: #fff !important;
+            }
+            /* 헤더 강조 */
+            table.table th {
+                font-weight: 600 !important;
+                background: #f2f2f2 !important;
+            }
+              
+            table.table td {
+                width: 80px !important;
+            }
+            /*
+            table.table td:not(:nth-child(1)):not(:nth-child(2)) {
+                width: 80px !important; 
+            }
+
+            table.table td:nth-child(1) {
+                width: 50px !important;
+            }
+
+            table.table td:nth-child(2) {
+                width: 120px !important;
+            }
+                */
+
+        /* 인쇄 시 헤더 고정 */
+        thead {
+            display: table-header-group !important;
+        }
+
+        tbody {
+            display: table-row-group !important;
+        }
+        /* 행이 페이지에서 잘리지 않게 */
+        tr, th, td {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+        /* 화면의 불필요한 영역 제거 */
+        .no-print {
+            display: none !important;
+        }
+
+        #partyname {
+            display: block !important;
+        }
     }
 </style>
 
