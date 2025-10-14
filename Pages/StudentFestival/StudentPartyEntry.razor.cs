@@ -500,45 +500,121 @@ namespace GBES.Pages.StudentFestival
         //        await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
         //    }
         //}
+        //public async Task DeleteModel()
+        //{
+        //    if (!isGameUsing)
+        //    {
+        //        if (JSRuntimeInjector != null && model != null)
+        //            await JSRuntimeInjector.InvokeVoidAsync("alert", model.gName + " 참가신청이 마감되었습니다.");
+        //        return;
+        //    }
+
+        //    if (JSRuntimeInjector == null || model == null)
+        //        return;
+
+        //    bool confirmed = await JSRuntimeInjector.InvokeAsync<bool>("confirm", model.name + "삭제 할까요?");
+        //    if (confirmed)
+        //    {
+        //        if (_contextFactory == null)
+        //            return;
+
+        //        //using var context = _contextFactory.CreateDbContext();
+        //        //context.Z_PartyEntries.Remove(model);
+        //        //await context.SaveChangesAsync();
+
+        //        using var context = await _contextFactory.CreateDbContextAsync();
+        //        context.Attach(model);
+        //        context.Entry(model).State = EntityState.Deleted;
+        //        await context.SaveChangesAsync();
+
+        //        if (listPartyEntry != null)
+        //        {
+        //            bool deleteList = listPartyEntry.Remove(model);
+        //            if (deleteList)
+        //            {
+        //                StateHasChanged();
+        //            }
+        //        }
+
+        //        await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
+        //    }
+        //}
+
         public async Task DeleteModel()
         {
             if (!isGameUsing)
             {
                 if (JSRuntimeInjector != null && model != null)
-                    await JSRuntimeInjector.InvokeVoidAsync("alert", model.gName + " 참가신청이 마감되었습니다.");
+                    await SafeJsAlert($"{model.gName} 참가신청이 마감되었습니다.");
                 return;
             }
 
-            if (JSRuntimeInjector == null || model == null)
+            if (JSRuntimeInjector == null || model == null || _contextFactory == null)
                 return;
 
-            bool confirmed = await JSRuntimeInjector.InvokeAsync<bool>("confirm", model.name + "삭제 할까요?");
-            if (confirmed)
+            // confirm 도 끊김 대비
+            bool confirmed = false;
+            try
             {
-                if (_contextFactory == null)
-                    return;
+                confirmed = await JSRuntimeInjector.InvokeAsync<bool>("confirm", $"{model.name} 삭제 할까요?");
+            }
+            catch (JSDisconnectedException) { return; }                 // 사용자 이탈
+            catch (InvalidOperationException) { return; }               // 렌더 타이밍 문제 등
 
-                //using var context = _contextFactory.CreateDbContext();
-                //context.Z_PartyEntries.Remove(model);
-                //await context.SaveChangesAsync();
+            if (!confirmed) return;
 
-                using var context = await _contextFactory.CreateDbContextAsync();
-                context.Attach(model);
-                context.Entry(model).State = EntityState.Deleted;
-                await context.SaveChangesAsync();
+            try
+            {
+                await using var context = await _contextFactory.CreateDbContextAsync();
 
+                // 더 간단히
+                context.Remove(model);                                   // Attach + Deleted 대신
+                await context.SaveChangesAsync();                        // ← DB 저장
+
+                // 메모리 리스트 갱신 (UI 스레드에서)
                 if (listPartyEntry != null)
                 {
-                    bool deleteList = listPartyEntry.Remove(model);
-                    if (deleteList)
-                    {
-                        StateHasChanged();
-                    }
+                    var removed = listPartyEntry.Remove(model);
+                    if (removed)
+                        await InvokeAsync(StateHasChanged);              // 안전한 렌더 호출
                 }
 
-                await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
+                // 모달 닫기 (연결 끊김 무시)
+                await SafeJsInvokeVoid("closeModal", "");
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // 이미 삭제된 경우 등 동시성 문제
+                await SafeJsAlert($"이미 삭제되었거나 변경되었습니다.\n{ex.Message}");
+            }
+            catch (ObjectDisposedException)
+            {
+                // 컴포넌트/회선 종료 중
+            }
+            catch (JSDisconnectedException)
+            {
+                // 사용자가 떠남 — 무시
+            }
+            catch (Exception ex)
+            {
+                //await SafeJsAlert($"삭제 중 오류가 발생했습니다.\n{ex.Message}");
             }
         }
+
+        private async Task SafeJsAlert(string message)
+        {
+            try { await JSRuntimeInjector!.InvokeVoidAsync("alert", message); }
+            catch (JSDisconnectedException) { /* 무시 */ }
+            catch (InvalidOperationException) { /* 렌더 윈도우 아님 — 무시 */ }
+        }
+
+        private async Task SafeJsInvokeVoid(string identifier, params object?[] args)
+        {
+            try { await JSRuntimeInjector!.InvokeVoidAsync(identifier, args); }
+            catch (JSDisconnectedException) { /* 무시 */ }
+            catch (InvalidOperationException) { /* 무시 */ }
+        }
+
 
 
         public async Task CancelModel()
