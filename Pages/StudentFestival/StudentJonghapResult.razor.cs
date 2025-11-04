@@ -486,12 +486,12 @@ namespace GBES.Pages.StudentFestival
             {
                 sectionHapArr[i] = 0;
             }
-            int n = 0;
+            //int n = 0;
             int cityY;
             int detailX;
             foreach (var detailResult in resultList)
             {
-                n++;
+                //n++;
                 cityY = Array.IndexOf(cityArr, detailResult.city);
                 detailX = Array.IndexOf(detailArr, detailResult.dName);
                 if (string.IsNullOrEmpty(rankArr[cityY, detailX]))
@@ -516,93 +516,155 @@ namespace GBES.Pages.StudentFestival
 
             }
 
-            // 시군 득점 합에 의한 순위 생성
+            // sectionHapArr : 팀별 총점(큰 값이 유리)
+            // sectionPartyArr : "불참" 여부 확인용
+            // rankArr[row, k] : "1)", "2)" ... 식으로 들어있는 세부 등위 문자열
+            // detailsu : 세부 경기 개수
+            // sectionRankArr : 결과 순위 문자열을 채워 넣는 배열
+
             if (sectionHapArr.Sum() > 0)
             {
-                for (int i = 0; i < 22; i++)
+                int n = sectionHapArr.Length;
+
+                // 1) 미리 각 팀의 1~6위 개수 카운트(사전식 비교용 key)
+                var keys = new (int one, int two, int three, int four, int five, int six)[n];
+
+                (int one, int two, int three, int four, int five, int six) CountKey(int row)
                 {
-                    if (sectionPartyArr[i] != "불참")
+                    int one = 0, two = 0, three = 0, four = 0, five = 0, six = 0;
+                    for (int k = 0; k < detailsu; k++)
                     {
-                        int L = 1;
-                        for (int j = 0; j < 22; j++)
-                        {
-                            if (sectionPartyArr[j] != "불참")
-                            {
-                                if (sectionHapArr[i] < sectionHapArr[j])
-                                {
-                                    L++;
-                                }
-                                else if (sectionHapArr[i] == sectionHapArr[j])
-                                {
-                                    int iOne = 0; int iTwo = 0; int iThree = 0;
-                                    int iFour = 0; int iFive = 0; int iSix = 0;
-                                    int jOne = 0; int jTwo = 0; int jThree = 0;
-                                    int jFour = 0; int jFive = 0; int jSix = 0;
-                                    for (int k = 0; k < detailsu; k++)
-                                    {
-                                        if (!string.IsNullOrEmpty(rankArr[i, k]))
-                                        {
-                                            if (rankArr[i, k].Contains("1)")) iOne++;
-                                            if (rankArr[i, k].Contains("2)")) iTwo++;
-                                            if (rankArr[i, k].Contains("3)")) iThree++;
-                                            if (rankArr[i, k].Contains("4)")) iFour++;
-                                            if (rankArr[i, k].Contains("5)")) iFive++;
-                                            if (rankArr[i, k].Contains("6)")) iSix++;
+                        var s = rankArr[row, k];
+                        if (string.IsNullOrEmpty(s)) continue;
 
-                                            if (!string.IsNullOrEmpty(rankArr[j, k]))
-                                            {
-                                                if (rankArr[j, k].Contains("1)")) jOne++;
-                                                if (rankArr[j, k].Contains("2)")) jTwo++;
-                                                if (rankArr[j, k].Contains("3)")) jThree++;
-                                                if (rankArr[j, k].Contains("4)")) jFour++;
-                                                if (rankArr[j, k].Contains("5)")) jFive++;
-                                                if (rankArr[j, k].Contains("6)")) jSix++;
-                                            }
-                                        }
-                                    }
-
-                                    if (iOne < jOne)
-                                    {
-                                        L++;
-                                    }
-                                    else if (iOne == jOne)
-                                    {
-                                        if (iTwo < jTwo)
-                                        {
-                                            L++;
-                                        }
-                                        else if (iTwo == jTwo)
-                                        {
-                                            if (iThree < jThree)
-                                            {
-                                                L++;
-                                            }
-                                            else if (iFour == jFour)
-                                            {
-                                                if (iFour < jFour)
-                                                {
-                                                    L++;
-                                                }
-                                                else if (iFive == jFive)
-                                                {
-                                                    if (iSix < jSix)
-                                                    {
-                                                        L++;
-                                                    }
-                                                }
-
-                                            }
-
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                        sectionRankArr[i] = L.ToString();
+                        if (s.Contains("1)")) one++;
+                        if (s.Contains("2)")) two++;
+                        if (s.Contains("3)")) three++;
+                        if (s.Contains("4)")) four++;
+                        if (s.Contains("5)")) five++;
+                        if (s.Contains("6)")) six++;
                     }
+                    return (one, two, three, four, five, six);
+                }
+
+                for (int i = 0; i < n; i++)
+                    keys[i] = CountKey(i);
+
+                // 2) 순위 계산: j가 i보다 "더 좋으면" L++
+                for (int i = 0; i < n; i++)
+                {
+                    if (sectionPartyArr[i] == "불참")
+                    {
+                        sectionRankArr[i] = ""; // 필요시 빈칸 처리
+                        continue;
+                    }
+
+                    int L = 1;
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (i == j || sectionPartyArr[j] == "불참") continue;
+
+                        // j가 i보다 좋은가?
+                        bool jBetter =
+                            (sectionHapArr[j] > sectionHapArr[i]) ||                                        // 점수 크게 유리
+                            (sectionHapArr[j] == sectionHapArr[i] && keys[j].CompareTo(keys[i]) > 0);      // 동점 → 1~6위 사전식 비교
+
+                        if (jBetter) L++;
+                    }
+
+                    sectionRankArr[i] = L.ToString();
                 }
             }
+
+            // 시군 득점 합에 의한 순위 생성
+            //if (sectionHapArr.Sum() > 0)
+            //{
+            //    for (int i = 0; i < 22; i++)
+            //    {
+            //        if (sectionPartyArr[i] != "불참")
+            //        {
+            //            int L = 1;
+            //            for (int j = 0; j < 22; j++)
+            //            {
+            //                if (sectionPartyArr[j] != "불참")
+            //                {
+            //                    if (sectionHapArr[i] < sectionHapArr[j])
+            //                    {
+            //                        L++;
+            //                    }
+            //                    else if (sectionHapArr[i] == sectionHapArr[j])
+            //                    {
+
+            //                        int iOne = 0; int iTwo = 0; int iThree = 0;
+            //                        int iFour = 0; int iFive = 0; int iSix = 0;
+            //                        int jOne = 0; int jTwo = 0; int jThree = 0;
+            //                        int jFour = 0; int jFive = 0; int jSix = 0;
+
+            //                        for (int k = 0; k < detailsu; k++)
+            //                        {
+            //                            if (!string.IsNullOrEmpty(rankArr[i, k]))
+            //                            {
+            //                                if (rankArr[i, k].Contains("1)")) iOne++;
+            //                                if (rankArr[i, k].Contains("2)")) iTwo++;
+            //                                if (rankArr[i, k].Contains("3)")) iThree++;
+            //                                if (rankArr[i, k].Contains("4)")) iFour++;
+            //                                if (rankArr[i, k].Contains("5)")) iFive++;
+            //                                if (rankArr[i, k].Contains("6)")) iSix++;
+
+            //                                if (!string.IsNullOrEmpty(rankArr[j, k]))
+            //                                {
+            //                                    if (rankArr[j, k].Contains("1)")) jOne++;
+            //                                    if (rankArr[j, k].Contains("2)")) jTwo++;
+            //                                    if (rankArr[j, k].Contains("3)")) jThree++;
+            //                                    if (rankArr[j, k].Contains("4)")) jFour++;
+            //                                    if (rankArr[j, k].Contains("5)")) jFive++;
+            //                                    if (rankArr[j, k].Contains("6)")) jSix++;
+            //                                }
+            //                            }
+            //                        }
+
+            //                        if (iOne < jOne)
+            //                        {
+            //                            L++;
+            //                        }
+            //                        else if (iOne == jOne)
+            //                        {
+            //                            if (iTwo < jTwo)
+            //                            {
+            //                                L++;
+            //                            }
+            //                            else if (iTwo == jTwo)
+            //                            {
+            //                                if (iThree < jThree)
+            //                                {
+            //                                    L++;
+            //                                }
+            //                                else if (iFour == jFour)
+            //                                {
+            //                                    if (iFour < jFour)
+            //                                    {
+            //                                        L++;
+            //                                    }
+            //                                    else if (iFive == jFive)
+            //                                    {
+            //                                        if (iSix < jSix)
+            //                                        {
+            //                                            L++;
+            //                                        }
+            //                                    }
+
+            //                                }
+
+            //                            }
+
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //            sectionRankArr[i] = L.ToString();
+            //        }
+            //    }
+            //}
 
 
             // 시군 순의에 의한 종별점수 생성
