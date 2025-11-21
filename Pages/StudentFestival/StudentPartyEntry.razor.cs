@@ -905,13 +905,13 @@ namespace GBES.Pages.StudentFestival
                             .ToList();
                 excelFileName = memberName;
 
-                if (sName != "종별선택")
-                {
-                    title += " " + sName + " ";
-                    excelPartyEntry = excelPartyEntry.Where(it => it.sName == sName)
-                                        .OrderBy(it => it.dNameOne).ToList();
-                    excelFileName += "_" + sName;
-                }
+                //if (sName != "종별선택")
+                //{
+                //    title += " " + sName + " ";
+                //    excelPartyEntry = excelPartyEntry.Where(it => it.sName == sName)
+                //                        .OrderBy(it => it.dNameOne).ToList();
+                //    excelFileName += "_" + sName;
+                //}
 
                 title = memberName + "참가신청 현황";
             }

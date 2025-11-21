@@ -45,13 +45,19 @@ namespace GBES.Pages
                     else if (member.memberName.Contains("지원청")) memPart = "교육지원청";
                     else if (member.memberName.Contains("경북교육청")) memPart = "경북교육청";
                     else if (member.memberName.Contains("관리자")) memPart = "경북교육청";
+                    else if(member.memberName.Contains("입력")) memPart = "입력";
                     else if (member.division == "경기단체") memPart = "경기단체";
 
                     appState.SetLogin(member.memberName, memPart, member.city, member.name);
 
                     await JSRuntimeInjector.InvokeVoidAsync("loginPass", member.memberName, memPart);
 
-                    NavigationManager.NavigateTo("/MemberFirst");
+                    if(memPart == "입력")
+                    {
+                        NavigationManager.NavigateTo("/PhysicalResult");
+                    }
+                    else
+                        NavigationManager.NavigateTo("/MemberFirst");
                 }
             }
         }

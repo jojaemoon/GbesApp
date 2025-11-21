@@ -69,12 +69,12 @@ namespace GBES.Pages.PhysicalKing
 
             using var context = _contextFactory.CreateDbContext();
             Z_PartyName? pName = context.Z_PartyNames
-                        .Where(it => it.partyName.Contains("체력")
-                                    && it.etc == "사용" || it.etc == "마감" || it.etc == "열람" || it.etc == "진행")
+                        .Where(it => it.partyName.Contains("경상북도 체력인증제")
+                                    && it.etc == "체력사용")
                         .FirstOrDefault();
             partyName = pName.partyName;
 
-            if (memberName == "경북교육청" || memberName == "관리자")
+            if (memberName == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
             {
                 if (pName.etc == "마감" || pName.etc == "진행" || pName.etc == "사용")
                 {
@@ -162,7 +162,7 @@ namespace GBES.Pages.PhysicalKing
             record.jumsuHap = record.gripJumsu + record.jumpJumsu + record.bendJumsu + record.run50mJumsu + record.movementJumsu;
         }
 
-        // 50m달리기 점수 주기
+        // 50m달리기 점수 주기   2025  40m달리기
         private async Task Run50mInput(ChangeEventArgs args, Z_PhysicalKingRecord? record)
         {
             if (record == null)
@@ -176,7 +176,7 @@ namespace GBES.Pages.PhysicalKing
 
             string? jum = await context.Z_PhysicalScoreCards
                                 .Where(it => it.partyName == partyName
-                                            && it.dName == "50m 달리기"
+                                            && it.dName == "40m 달리기"
                                             && it.record == record.run50mRecord)
                                 .Select(it => it.jumsu)
                                 .SingleOrDefaultAsync();
@@ -297,6 +297,7 @@ namespace GBES.Pages.PhysicalKing
 
             // 득점 합 계산하기
             personRecord.jumsuHap = personRecord.gripJumsu + personRecord.jumpJumsu + personRecord.bendJumsu + personRecord.run50mJumsu + personRecord.movementJumsu;
+            personRecord.etc = memberName;
             context.Z_PhysicalKingRecords.Update(personRecord);
             await context.SaveChangesAsync();
 
@@ -417,7 +418,7 @@ namespace GBES.Pages.PhysicalKing
             }
             cName = e.Value.ToString();
 
-            SectionClick(sName);
+            //SectionClick(sName);
 
             //using var context = _contextFactory.CreateDbContext();
 
@@ -454,14 +455,14 @@ namespace GBES.Pages.PhysicalKing
             }
             else
             {
-                if (memberName == "경북교육청" || memberName == "관리자")
+                if (memberName == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
                 {
                     // 입력
                     listGameResult = context.Z_PhysicalKingRecords
                       .Where(it => it.partyName == partyName
                                         && it.city == cName
                                         && it.sName == sname)
-                      .OrderBy(it => it.jumsuHap).ThenBy(it => it.name).ToList();
+                      .OrderBy(it => it.jumsuHap).ThenBy(it => it.numbering!.Length).ThenBy(it => it.numbering).ThenBy(it => it.name).ToList();
                 }
                 else
                 {
@@ -595,7 +596,7 @@ namespace GBES.Pages.PhysicalKing
         //}
 
         #region  기록 초기화 하기 
-        private async Task MakeResultInitialize()
+        private async Task MakeResultInitialize_OLD()
         {
             if (initializePassword != "1qaz")
             {
@@ -615,9 +616,17 @@ namespace GBES.Pages.PhysicalKing
                                      .Where(it => it.partyName == partyName)
                                       .ToListAsync();
                     context.Z_PhysicalKingRecords.RemoveRange(listKingRecord);
-                    context.SaveChanges();
+                    // await context.SaveChangesAsync();
 
                     Z_PhysicalKingRecord kingRecord = new Z_PhysicalKingRecord();
+
+                    List<Z_PartyEntry> listEntryAll = await context.Z_PartyEntries
+                                                   .Where(it => it.partyName == partyName)
+                                                   .OrderBy(it => it.city)
+                                                   .ToListAsync();
+
+
+
 
                     // 남자초등부
                     List<Z_PartyEntry> listEntry = await context.Z_PartyEntries
@@ -626,7 +635,7 @@ namespace GBES.Pages.PhysicalKing
                                                             && it.code == "남")
                                                    .OrderBy(it => it.city)
                                                    .ToListAsync();
-                    foreach (var item in listEntry)
+                    foreach (var item in listEntryAll)
                     {
                         kingRecord = new Z_PhysicalKingRecord();
                         kingRecord.city = item.city;
@@ -651,7 +660,7 @@ namespace GBES.Pages.PhysicalKing
                     context.Z_PartyEntries.UpdateRange(listEntry);
                     context.Z_PhysicalKingRecords.UpdateRange(listKingRecord);
 
-                    await context.SaveChangesAsync();
+                    //await context.SaveChangesAsync();
 
                     // 여자초등부
                     listKingRecord = new List<Z_PhysicalKingRecord>();
@@ -686,7 +695,7 @@ namespace GBES.Pages.PhysicalKing
                     context.Z_PartyEntries.UpdateRange(listEntry);
                     context.Z_PhysicalKingRecords.UpdateRange(listKingRecord);
 
-                    await context.SaveChangesAsync();
+                    // await context.SaveChangesAsync();
 
                     // 남자중학부
                     listEntry = await context.Z_PartyEntries
@@ -720,7 +729,7 @@ namespace GBES.Pages.PhysicalKing
                     context.Z_PartyEntries.UpdateRange(listEntry);
                     context.Z_PhysicalKingRecords.UpdateRange(listKingRecord);
 
-                    await context.SaveChangesAsync();
+                    //await context.SaveChangesAsync();
 
                     // 여자중학부
                     listKingRecord = new List<Z_PhysicalKingRecord>();
@@ -755,7 +764,7 @@ namespace GBES.Pages.PhysicalKing
                     context.Z_PartyEntries.UpdateRange(listEntry);
                     context.Z_PhysicalKingRecords.UpdateRange(listKingRecord);
 
-                    await context.SaveChangesAsync();
+                    //await context.SaveChangesAsync();
 
                     // 남자고등부
                     listEntry = await context.Z_PartyEntries
@@ -789,7 +798,7 @@ namespace GBES.Pages.PhysicalKing
                     context.Z_PartyEntries.UpdateRange(listEntry);
                     context.Z_PhysicalKingRecords.UpdateRange(listKingRecord);
 
-                    await context.SaveChangesAsync();
+                    //await context.SaveChangesAsync();
 
                     // 여자중학부
                     listKingRecord = new List<Z_PhysicalKingRecord>();
@@ -827,25 +836,212 @@ namespace GBES.Pages.PhysicalKing
                     await context.SaveChangesAsync();
 
                     await JSRuntimeInjector.InvokeVoidAsync("alert", " 결과를 초기화 하였습니다.");
-
-                    // 넘버링을 주자
-                    List<Z_PhysicalKingRecord> listRecord = await context.Z_PhysicalKingRecords
-                                                           .Where(it => it.partyName == partyName)
-                                                           .OrderBy(it => it.city)
-                                                           .ToListAsync();
-                    int numbering = 0;
-                    foreach (var item in listRecord)
-                    {
-                        numbering++;
-                        item.numbering = numbering.ToString();
-                        item.passWord = "1234";
-                    }
-                    context.Z_PhysicalKingRecords.UpdateRange(listRecord);
-                    await context.SaveChangesAsync();
                 }
 
             }
 
+        }
+
+
+        private async Task MakeResultInitialize()
+        {
+            if (initializePassword != "1qaz")
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "패스워드가 틀립니다.");
+                return;
+            }
+
+            bool confirmed = await JSRuntimeInjector.InvokeAsync<bool>(
+                "confirm", "기존 자료가 모두 지워집니다. 진행할까요?");
+
+            if (!confirmed) return;
+
+            await using var context = _contextFactory.CreateDbContext();
+
+            // 1) 기존 결과 삭제
+            var oldRecords = await context.Z_PhysicalKingRecords
+                .Where(it => it.partyName == partyName)
+                .ToListAsync();
+
+            context.Z_PhysicalKingRecords.RemoveRange(oldRecords);
+            await context.SaveChangesAsync();
+
+            // 공통 함수: 파티엔트리 → 결과 레코드 생성
+            async Task CreateGroupAsync(string schoolPart, string genderCode, string defaultSName)
+            {
+                var entries = await context.Z_PartyEntries
+                    .Where(it => it.partyName == partyName
+                              && it.schoolName.Contains(schoolPart)
+                              && it.code == genderCode)
+                    .OrderBy(it => it.city)
+                    .ToListAsync();
+
+                foreach (var e in entries)
+                {
+                    // sName 비어 있으면 채우기
+                    if (string.IsNullOrEmpty(e.sName))
+                    {
+                        e.sName = defaultSName;
+                    }
+
+                    var rec = new Z_PhysicalKingRecord
+                    {
+                        city = e.city,
+                        code = e.code,
+                        name = e.name,
+                        schoolName = e.schoolName,
+                        schoolYear = e.schoolYear,
+                        sName = e.sName,
+                        partyName = e.partyName,
+                        year = e.year
+                    };
+
+                    // ★ 새 엔터티는 Add (Update 아님)
+                    context.Z_PhysicalKingRecords.Add(rec);
+                }
+
+                // ★ entries 는 이미 트래킹 중이라 UpdateRange 불필요
+                // context.Z_PartyEntries.UpdateRange(entries); // 필요 없음
+            }
+
+            // 2) 각 종별별 생성
+            await CreateGroupAsync("초등", "남", "남자초등부");
+            await CreateGroupAsync("초등", "여", "여자초등부");
+            await CreateGroupAsync("중학", "남", "남자중학부");
+            await CreateGroupAsync("중학", "여", "여자중학부");
+            await CreateGroupAsync("고등", "남", "남자고등부");
+            await CreateGroupAsync("고등", "여", "여자고등부");
+
+            // 3) 한 번에 저장
+            await context.SaveChangesAsync();
+
+            await JSRuntimeInjector.InvokeVoidAsync("alert", "결과를 초기화 하였습니다.");
+        }
+
+
+        private async Task NumberingInput()
+        {
+            if (initializePassword != "1qaz")
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "패스워드가 틀립니다.");
+                return;
+            }
+            // 넘버링을 주자
+            var cityOrder = new Dictionary<string, int>
+            {
+                ["경산"] = 1,
+                ["영천"] = 2,
+                ["청도"] = 3,
+                ["고령"] = 4,
+                ["성주"] = 5,
+                ["칠곡"] = 6,
+                ["경주"] = 7,
+                ["포항"] = 8,
+                ["울릉"] = 9,
+                ["구미"] = 10,
+                ["김천"] = 11,
+                ["의성"] = 12,
+                ["영양"] = 13,
+                ["울진"] = 14,
+                ["봉화"] = 15,
+                ["영주"] = 16,
+                ["청송"] = 17,
+                ["영덕"] = 18,
+                ["안동"] = 19,
+                ["예천"] = 20,
+                ["문경"] = 21,
+                ["상주"] = 22
+            };
+
+            var schoolOrder = new Dictionary<string, int>
+            {
+                ["초등"] = 1,
+                ["중학"] = 2,
+                ["고등"] = 3
+            };
+
+            var snameOrder = new Dictionary<string, int>
+            {
+                ["남자초등부"] = 1,
+                ["여자초등부"] = 2,
+                ["남자중학부"] = 3,
+                ["여자중학부"] = 4,
+                ["남자고등부"] = 5,
+                ["여자고등부"] = 6
+            };
+
+            string genderOrder(string sname)
+            {
+                if (string.IsNullOrEmpty(sname)) return "여"; // 기본값
+                return sname.StartsWith("남") ? "남" : "여";
+            }
+
+            var genderRank = new Dictionary<string, int>
+            {
+                ["남"] = 1,
+                ["여"] = 2
+            };
+
+            using var context = _contextFactory.CreateDbContext();
+
+            var listRecord = await context.Z_PhysicalKingRecords
+                        .Where(it => it.partyName == partyName)
+                        .ToListAsync();    // AsNoTracking() 빼기
+
+            // 정렬은 그대로
+            var sorted = listRecord
+            // 1) 시군 순서
+            .OrderBy(it =>
+            {
+                var city = it.city ?? "";
+                return cityOrder.TryGetValue(city, out var ord) ? ord : 999;
+            })
+            // 2) 학교급: 초등 → 중학 → 고등
+            .ThenBy(it =>
+            {
+                var schoolName = it.schoolName ?? "";
+
+                string level =
+                    schoolName.Contains("초등") ? "초등" :
+                    schoolName.Contains("중학") ? "중학" :
+                    schoolName.Contains("고등") ? "고등" :
+                    "기타";
+
+                return schoolOrder.TryGetValue(level, out var ord) ? ord : 999;
+            })
+            .ThenBy(it=>it.schoolName)
+            // 3) 종별: 남자 → 여자 (sName 기준)
+            .ThenBy(it =>
+            {
+                var sname = it.sName ?? "";
+                string g = genderOrder(sname);  // "남" 또는 "여"
+                return genderRank.TryGetValue(g, out var ord) ? ord : 999;
+            })
+            // 4) 학년 (숫자로 정렬)
+            .ThenBy(it =>
+            {
+                if (int.TryParse(it.schoolYear, out var sy))
+                    return sy;
+                return 0;
+            })
+            // 5) 이름
+            .ThenBy(it => it.name ?? "")
+            .ToList();
+
+            int numbering = 0;
+
+            foreach (var item in sorted)
+            {
+                numbering++;
+
+                // 이미 context가 추적 중인 엔터티라서 그냥 수정만 하면 됨
+                item.numbering = numbering.ToString();
+                item.passWord = "1234";
+            }
+
+            await context.SaveChangesAsync();
+
+            await JSRuntimeInjector.InvokeVoidAsync("alert", "넘버링을 부여하였습니다.");
         }
         #endregion
 
@@ -862,7 +1058,7 @@ namespace GBES.Pages.PhysicalKing
 
             excelPartyEntry = context.Z_PhysicalKingRecords
                              .Where(it => it.partyName == partyName)
-                             .OrderBy(it => it.city)
+                             .OrderBy(it => it.numbering!.Length).ThenBy(it => it.numbering)
                              .ToList();
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

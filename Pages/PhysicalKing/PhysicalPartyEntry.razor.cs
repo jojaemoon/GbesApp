@@ -78,11 +78,11 @@ namespace GBES.Pages.PhysicalKing
             {
                 using var context = _contextFactory.CreateDbContext();
                 Z_PartyName? pName = context.Z_PartyNames
-                            .Where(it => it.partyName.Contains("체력")
-                                        && (it.etc == "사용" || it.etc == "마감" || it.etc == "열람"))
-                            .FirstOrDefault();
+                         .Where(it => it.partyName.Contains("경상북도 체력인증제")
+                                     && it.etc == "체력사용")
+                         .FirstOrDefault();
                 partyName = pName.partyName;
-                if (pName.etc == "사용" || memberName == "경북교육청" || memberName == "관리자")
+                if (pName.etc == "사용" || memberName == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
                 {
                     showOrHideClass = "showCSS";
                 }
@@ -90,7 +90,7 @@ namespace GBES.Pages.PhysicalKing
 
                 // 교육지원청 
                 cNameList = appState.GetCities();
-                if (memberPart == "경북교육청" || memberName == "관리자")
+                if (memberPart == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
                 {
                     isDisabledCity = false;
                     isDisabledSchool = false;
@@ -204,7 +204,7 @@ namespace GBES.Pages.PhysicalKing
                 isDisabledCity = true;
                 isDisabledSchool = false;
             }
-            else if (memberPart == "경북교육청" || memberName == "관리자")
+            else if (memberPart == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
             {
                 //schoolNameList.Add("경북체육중학교");
                 //schoolNameList.Add("경북체육고등학교");
@@ -237,7 +237,7 @@ namespace GBES.Pages.PhysicalKing
                 isDisabledCity = true;
                 isDisabledSchool = false;
             }
-            else if (memberPart == "경북교육청" || memberName == "관리자")
+            else if (memberPart == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
             {
                 isDisabledCity = false;
                 isDisabledSchool = false;
@@ -282,7 +282,7 @@ namespace GBES.Pages.PhysicalKing
                     item.code = model.code;
                     item.schoolYear = model.schoolYear;
                     item.schoolName = model.schoolName;
-                    if (model.schoolName.Contains("초등") && model.code == "남") item.sName = "남자초등부";
+                    if (model.schoolName!.Contains("초등") && model.code == "남") item.sName = "남자초등부";
                     else if (model.schoolName.Contains("초등") && model.code == "여") item.sName = "여자초등부";
                     else if (model.schoolName.Contains("중학") && model.code == "남") item.sName = "남자중학부";
                     else if (model.schoolName.Contains("중학") && model.code == "여") item.sName = "여자중학부";
@@ -302,6 +302,31 @@ namespace GBES.Pages.PhysicalKing
                 model.schoolName = modalSelectSchool;
                 model.partyName = partyName;
                 model.year = year;
+
+                if (modalSelectSchool!.Contains("초등") && model.code == "남") model.sName = "남자초등부";
+                else if (modalSelectSchool.Contains("초등") && model.code == "여") model.sName = "여자초등부";
+                else if (modalSelectSchool.Contains("중학") && model.code == "남") model.sName = "남자중학부";
+                else if (modalSelectSchool.Contains("중학") && model.code == "여") model.sName = "여자중학부";
+                else if (modalSelectSchool.Contains("고등") && model.code == "남") model.sName = "남자고등부";
+                else if (modalSelectSchool.Contains("고등") && model.code == "여") model.sName = "여자고등부";
+
+                // 현장 추가 시  Z_PhysicalKingRecords 에 넣기
+                if(memberName!.Contains("입력"))
+                {
+                    Z_PhysicalKingRecord kingRecord = new Z_PhysicalKingRecord();
+                    kingRecord = new Z_PhysicalKingRecord();
+                    kingRecord.city = model.city;
+                    kingRecord.code = model.code;
+                    kingRecord.name = model.name;
+                    kingRecord.schoolName = model.schoolName;
+                    kingRecord.schoolYear = model.schoolYear;
+                    kingRecord.passWord = "1234";
+                    kingRecord.sName = model.sName;
+                    kingRecord.partyName = model.partyName;
+                    kingRecord.year = model.year;
+                    kingRecord.numbering = model.etc;
+                    context.Z_PhysicalKingRecords.Add(kingRecord);
+                }
 
                 context.Z_PartyEntries.Add(model);
                 context.SaveChanges();
@@ -393,7 +418,7 @@ namespace GBES.Pages.PhysicalKing
                             .ToListAsync();
                 excelFileName = cName;
             }
-            else if (memberPart == "경북교육청" || memberName == "관리자")
+            else if (memberPart == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
             {
                 excelPartyEntry = await context.Z_PartyEntries
                             .Where(it => it.partyName == partyName)

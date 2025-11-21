@@ -30,6 +30,7 @@
             {
                 <input type="" class="inputPass" @bind="initializePassword" placeholder="비밀번호" />
                 <button class="btn btn-danger" @onclick="MakeResultInitialize">결과초기화</button>
+                <button class="btn btn-warning" @onclick="NumberingInput">넘버링주기</button>
                 <button id="excelDown" class="excel" @onclick="DownLoadPartyEntry">엑셀다운받기<img src="../imgs/sub/excel_icon.png"></button>
             }
             else
@@ -49,13 +50,13 @@
         </div>
     </div>
 
-    @if ((memberName == "경북교육청" || memberName == "관리자") && cName != "전체")
+    @if ((memberName == "경북교육청" || memberName == "관리자" || memberName.Contains("입력")) && cName != "전체")
     {
-        <div class="data_list">
+        <div class="data_list" style="max-height: 600px; overflow-y: auto;">
             <div>
                 <table class="table table--block" cellspacing="0" cellpadding="0">
                     <thead>
-                        @if (memberName == "경북교육청" || memberName == "관리자")
+                        @if (memberName == "경북교육청" || memberName == "관리자" || memberName.Contains("입력"))
                         {
                             <tr id="trSample">
                                 <td colspan="6" style="text-align: right;">입력예시</td>
@@ -77,7 +78,7 @@
                             <th>악력</th>
                             <th>제자리멀리뛰기</th>
                             <th>윗몸앞으로굽히기</th>
-                            <th>50m 달리기</th>
+                            <th>40m 달리기</th>
                             <th>순환운동</th>
                             <th>합계</th>
                             <th>순위</th>
@@ -92,7 +93,9 @@
                         {
                             i++;
                             <tr>
-                                <td class="tdNumbering" rowspan="2">@item.numbering</td>
+                                <td class="tdNumbering" rowspan="2">
+                                    <input type="text" class="numbering" value="@item.numbering" style="width: 80px; text-align: center;">
+                                </td>
                                 <td class="tdPlayer" rowspan="2">@item.name</td>
                                 <td class="tdSchoolname" rowspan="2">@item.schoolName</td>
                                 <td class="tdSchoolYear" rowspan="2">@item.schoolYear</td>
@@ -163,7 +166,7 @@
                             <th>악력</th>
                             <th>제자리멀리뛰기</th>
                             <th>윗몸앞으로굽히기</th>
-                            <th>50m 달리기</th>
+                            <th>40m 달리기</th>
                             <th>순환운동</th>
                             <th>합계</th>
                             <th>순위</th>
@@ -429,5 +432,17 @@
 
     table > tbody > tr > td.tdBottom {
         border-bottom: 1px solid #f2f2f2;
+    }
+
+    .data_list {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 10;
     }
 </style>

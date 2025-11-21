@@ -42,9 +42,9 @@ namespace GBES.Pages.PhysicalKing
             using var context = _contextFactory.CreateDbContext();
 
             Z_PartyName? pName = context.Z_PartyNames
-                            .Where(it => it.partyName.Contains("체력")
-                                        && (it.etc == "사용" || it.etc == "마감" || it.etc == "열람"))
-                            .FirstOrDefault();
+                        .Where(it => it.partyName.Contains("경상북도 체력인증제")
+                                    && it.etc == "체력사용")
+                        .FirstOrDefault();
             partyName = pName.partyName;
             //if (memberPart == "학교")
             //{

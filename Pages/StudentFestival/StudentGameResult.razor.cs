@@ -359,28 +359,31 @@ namespace GBES.Pages.StudentFestival
                 || (gName == "탁구" && dName.Contains("단체")) || ((gName == "사격" || gName == "양궁") && dName.Contains("단체")))
             {
                 detailInwon = 4;
-                app = model.name.Split(",");
-                if (app.Count() > 3)
+                if (!string.IsNullOrEmpty(model.name))
                 {
-                    onePlayer = app[0];
-                    twoPlayer = app[1];
-                    threePlayer = app[2];
-                    fourPlayer = app[3];
-                }
-                else if (app.Count() > 2)
-                {
-                    onePlayer = app[0];
-                    twoPlayer = app[1];
-                    threePlayer = app[2];
-                }
-                else if (app.Count() > 1)
-                {
-                    onePlayer = app[0];
-                    twoPlayer = app[1];
-                }
-                else if (app.Count() > 0)
-                {
-                    onePlayer = app[0];
+                    app = model.name.Split(",");
+                    if (app.Count() > 3)
+                    {
+                        onePlayer = app[0];
+                        twoPlayer = app[1];
+                        threePlayer = app[2];
+                        fourPlayer = app[3];
+                    }
+                    else if (app.Count() > 2)
+                    {
+                        onePlayer = app[0];
+                        twoPlayer = app[1];
+                        threePlayer = app[2];
+                    }
+                    else if (app.Count() > 1)
+                    {
+                        onePlayer = app[0];
+                        twoPlayer = app[1];
+                    }
+                    else if (app.Count() > 0)
+                    {
+                        onePlayer = app[0];
+                    }
                 }
             }
             else if (dName.Contains("3인"))
@@ -597,7 +600,8 @@ namespace GBES.Pages.StudentFestival
                                               || it.dNameThree == dName
                                               || it.dNameFour == dName
                                               || it.dNameFive == dName)
-                                        && it.name == onePlayer)
+                                        && it.name != null
+                                        && it.name!.Trim() == onePlayer)
                              .FirstOrDefault();
                     if (gName == "양궁" || gName == "자전거" || gName == "체조" || gName == "소프트테니스")
                     {
@@ -643,7 +647,7 @@ namespace GBES.Pages.StudentFestival
             if (detailInwon < 4 && onePlayer != "")
             {
                 Z_PartyEntry? entry = context.Z_PartyEntries
-                         .Where(it => it.partyName == partyName 
+                         .Where(it => it.partyName == partyName
                                     && it.city == tfootSelectCity
                                     && it.gName == gName
                                     && it.sName == sName
@@ -657,7 +661,7 @@ namespace GBES.Pages.StudentFestival
                 if (gName == "양궁" || gName == "자전거" || gName == "체조" || gName == "소프트테니스")
                 {
                     entry = context.Z_PartyEntries
-                         .Where(it => it.partyName == partyName 
+                         .Where(it => it.partyName == partyName
                                     && it.city == tfootSelectCity
                                     && it.gName == gName
                                     && it.sName == sName
@@ -669,6 +673,10 @@ namespace GBES.Pages.StudentFestival
                     model.name += "," + twoPlayer;
                     model.coach += "," + entry.jumin;
                 }
+            }
+            else if(gName=="사격" && dName!.Contains("단체"))
+            {
+                model.name += "," + twoPlayer;
             }
 
         }
@@ -708,6 +716,10 @@ namespace GBES.Pages.StudentFestival
                     model.coach += "," + entry.jumin;
                 }
             }
+            else if (gName == "사격" && dName!.Contains("단체"))
+            {
+                model.name += "," + threePlayer;
+            }
         }
         private void FourPlayer_Changed(ChangeEventArgs e)
         {
@@ -744,6 +756,10 @@ namespace GBES.Pages.StudentFestival
                     model.name += "," + fourPlayer;
                     model.coach += "," + entry.jumin;
                 }
+            }
+            else if (gName == "사격" && dName!.Contains("단체"))
+            {
+                model.name += "," + fourPlayer;
             }
         }
 
