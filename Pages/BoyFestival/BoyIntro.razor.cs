@@ -136,7 +136,7 @@ namespace GBES.Pages.BoyFestival
         // 참가신청요강 다운로드
         public async Task DownLoad()
         {
-            var fileName = year + "년 경북소년체육대회 참가요강.pdf";
+            var fileName = year + "년 경북소년체육대회 참가요강.hwp";
 
             if (!string.IsNullOrEmpty(fileName))
             {

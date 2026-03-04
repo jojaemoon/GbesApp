@@ -1,14 +1,15 @@
-﻿using GBES.Models;
+﻿using DocumentFormat.OpenXml.InkML;
+using GBES.Models;
 using GBES.Services;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
-using OfficeOpenXml.Style;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System.Security.Claims;
 using System.Security.Cryptography.Pkcs;
-using DocumentFormat.OpenXml.InkML;
 
 namespace GBES.Pages.BoyFestival
 {
@@ -980,6 +981,63 @@ namespace GBES.Pages.BoyFestival
                 FileUtil.SaveAs(JSRuntimeInjector, excelFileName + " 참가현황.xlsx", package.GetAsByteArray());
             }
         }
+
+        #region 주민번호 입력 관련
+        private ElementReference juminRef;
+
+        private void OnInput(ChangeEventArgs e)
+        {
+            var val = e.Value?.ToString() ?? "";
+            // 숫자와 하이픈만 허용, 자동 하이픈 삽입
+            val = new string(val.Where(c => char.IsDigit(c) || c == '-').ToArray());
+            val = AutoFormat(val);
+            model.jumin = val;
+        }
+
+        private async Task ValidateDate(FocusEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(model.jumin))
+                return;
+
+            if (!DateTime.TryParseExact(model.jumin,
+                                        "yyyy-MM-dd",
+                                        System.Globalization.CultureInfo.InvariantCulture,
+                                        System.Globalization.DateTimeStyles.None,
+                                        out _))
+            {
+                // alert 띄우기
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "날짜 형식은 yyyy-MM-dd 입니다.");
+
+                // model 값 초기화
+                model.jumin = "";
+
+                // 포커스 복구 — ElementReference.FocusAsync() 대신 JS 헬퍼 사용 (더 안전)
+                try
+                {
+                    await JSRuntimeInjector.InvokeVoidAsync("blazorHelpers.focusElement", juminRef);
+                }
+                catch (JSException)
+                {
+                    // 드물게 JS 호출 실패시 대체: 작은 딜레이 후 재시도
+                    await Task.Delay(50);
+                    await JSRuntimeInjector.InvokeVoidAsync("blazorHelpers.focusElement", juminRef);
+                }
+            }
+        }
+
+        private string AutoFormat(string v)
+        {
+            var digits = new string(v.Where(char.IsDigit).ToArray());
+
+            if (digits.Length <= 4)
+                return digits;
+            if (digits.Length <= 6)
+                return digits.Insert(4, "-");
+            if (digits.Length <= 8)
+                return digits.Insert(4, "-").Insert(7, "-");
+            return digits.Substring(0, 8).Insert(4, "-").Insert(7, "-");
+        }
+        #endregion  주민번호 입력 관련
 
         #region  구 로직
         //// 모달 종목명 선택시

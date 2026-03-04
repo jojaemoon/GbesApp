@@ -294,8 +294,13 @@ namespace GBES.Pages.BoyFestival
         }
 
         // 수정
-        public void RecordEdit(Z_GameResult gameresult)
+        public async Task RecordEdit(Z_GameResult gameresult)
         {
+            if(dName==null)
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "종목, 종별, 세부종목을 선택하세요");
+                return;
+            }
             model = gameresult;
             detailInwon = 1;
             using var context = _contextFactory.CreateDbContext();
@@ -538,6 +543,12 @@ namespace GBES.Pages.BoyFestival
         // 삭제
         private async Task DeleteModel(Z_GameResult gameresult)
         {
+            if (dName == null)
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "종목, 종별, 세부종목을 선택하세요");
+                return;
+            }
+
             bool isDelete = await JSRuntimeInjector.InvokeAsync<bool>("confirm", gameresult.name + " 삭제 할까요?");
             if (isDelete)
             {

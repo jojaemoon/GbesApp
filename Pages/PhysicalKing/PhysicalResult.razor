@@ -94,7 +94,7 @@
                             i++;
                             <tr>
                                 <td class="tdNumbering" rowspan="2">
-                                    <input type="text" class="numbering" value="@item.numbering" style="width: 80px; text-align: center;">
+                                    <input type="text" class="numbering" @bind-value="item.numbering" style="width: 80px; text-align: center;">
                                 </td>
                                 <td class="tdPlayer" rowspan="2">@item.name</td>
                                 <td class="tdSchoolname" rowspan="2">@item.schoolName</td>

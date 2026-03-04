@@ -1089,6 +1089,9 @@ namespace GBES.Pages.PhysicalKing
                 worksheet.Column(21).Width = 6;
                 worksheet.Column(22).Width = 6;
                 worksheet.Column(23).Width = 6;
+                worksheet.Column(24).Width = 6;
+                worksheet.Column(25).Width = 6;
+                worksheet.Column(26).Width = 6;
 
                 // 제목 시작
                 worksheet.Cells[1, 1, 1, 13].Merge = true;
@@ -1114,6 +1117,9 @@ namespace GBES.Pages.PhysicalKing
                          학교명 = m.schoolName,
                          학년 = m.schoolYear,
                          종별 = m.sName,
+                         달리기40m기록 = m.run50mRecord,
+                         달리기40m점수 = m.run50mJumsu,
+                         달리기40m순위 = m.run50mRank,
                          악력기록 = m.gripRecord,
                          악력점수 = m.gripJumsu,
                          악력순위 = m.gripRank,

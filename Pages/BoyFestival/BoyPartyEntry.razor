@@ -33,7 +33,7 @@ else
 {
     <div id="search">
         <div class="wrap">
-            <h2>2025 경북소년체육대회 참가선수 목록 <span class="red">결과 @listPartyEntry.Count<span>명</span></span></h2>
+            <h2>2026 경북소년체육대회 참가선수 목록 <span class="red">결과 @listPartyEntry.Count<span>명</span></span></h2>
             <div class="filter">
                 <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
                 <select value="@cName" @onchange="SelectCity" disabled="@isDisabledCity">
@@ -205,7 +205,15 @@ else
                 <div class="type">
                     <div class="title">생년월일</div>
                     <div class="data">
-                        <input type="text" @bind="model.jumin" placeholder="주민번호앞자리" required />
+                        @* <input type="text" @bind="model.jumin" placeholder="주민번호앞자리" required /> *@
+                        <input @ref="juminRef"
+                               type="text"
+                               value="@model.jumin"
+                               placeholder="yyyy-MM-dd (예: 2013-02-15)"
+                               @oninput="OnInput"
+                               @onblur="ValidateDate"
+                               maxlength="10"
+                               class="form-control" />
                     </div>
                 </div>
                 <div class="type">
