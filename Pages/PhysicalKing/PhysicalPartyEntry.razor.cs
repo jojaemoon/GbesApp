@@ -355,7 +355,7 @@ namespace GBES.Pages.PhysicalKing
                     StateHasChanged();
                 }
 
-                await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal-custom");
+                await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal1");
                 await JSRuntimeInjector.InvokeVoidAsync("alert", "삭제하였습니다.");
             }
         }
@@ -365,7 +365,7 @@ namespace GBES.Pages.PhysicalKing
             //selectGame = "";
             //selectSection = "";
            
-            await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal-custom");
+            await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal1");
         }
 
         // 모달 시군 Bind

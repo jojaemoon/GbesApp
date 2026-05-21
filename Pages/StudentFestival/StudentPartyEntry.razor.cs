@@ -580,7 +580,7 @@ namespace GBES.Pages.StudentFestival
                 }
 
                 // 모달 닫기 (연결 끊김 무시)
-                await SafeJsInvokeVoid("closeModal", "");
+                await SafeJsInvokeVoid("closeModal", "modal1");
             }
             catch (DbUpdateConcurrencyException ex)
             {

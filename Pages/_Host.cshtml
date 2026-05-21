@@ -40,7 +40,7 @@
     <link href="../css/graph.css" rel="stylesheet">
 
     <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
-    <script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script>
         $(document).ready(function () {
             $('.menu_btn').click(function () {
@@ -163,23 +163,31 @@
 
     <script>
         //팝업 열기
-        function openModal(modalname) {
-            document.get
-            $("." + modalname).fadeIn(300);
-        }
-        // 팝업 닫기
-        //function closeModal(modalname) {
-        //    document.get
-        //    $("." + modal - customOfficer).fadeOut(300);
-        //}
-        // $('.close-modal').click(function () {
-        //     $(".modal-custom").fadeOut(300);
-        // });
-        function closeModal(modalname) {
-            if (modalname == "") {
-                $(".modal-custom").fadeOut(300);
+                function openModal(modalname) {
+            if (!modalname) {
+                $(".modal-custom").fadeIn(300);
+                return;
             }
-            $("." + modalname).fadeOut(300);
+
+            if (modalname.startsWith(".")) {
+                $(modalname).fadeIn(300);
+            } else {
+                $("." + modalname).fadeIn(300);
+            }
+        }
+
+        // 팝업 닫기
+        function closeModal(modalname) {
+            if (!modalname) {
+                $(".modal-custom").fadeOut(300);
+                return;
+            }
+
+            if (modalname.startsWith(".")) {
+                $(modalname).fadeOut(300);
+            } else {
+                $("." + modalname).fadeOut(300);
+            }
         }
 
         function loginPass(memName, memPart) {
@@ -234,7 +242,7 @@
                 <div class="collapse navbar-collapse me-n3" id="navbarCollapse">
                     <div class="navbar-nav  ms-auto">
                         <div class="nav-item dropdown">
-                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" style="font-weight:bold; color: red;">소년체육대회</a>
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">소년체육대회</a>
                             <div class="dropdown-menu m-0 ">
                                 <a href="/BoyIntro" class="dropdown-item">대회요강</a>
                                 <a href="/BoyPartyEntry" class="dropdown-item">참가신청</a>
@@ -244,7 +252,7 @@
                             </div>
                         </div>
                         <div class="nav-item dropdown">
-                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">학년별육상경기대회</a>
+                            <a href="" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" style="font-weight:bold; color: red;">학년별육상경기대회</a>
                             <div class="dropdown-menu m-0 ">
                                 <a href="/YearTrackIntro" class="dropdown-item">대회요강</a>
                                 <a href="/YearTrackPartyEntry" class="dropdown-item">참가신청</a>

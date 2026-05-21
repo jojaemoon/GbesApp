@@ -531,7 +531,7 @@ namespace GBES.Pages.BoyFestival
                     StateHasChanged();
                 }
 
-                await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
+                await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal1");
             }
         }
         public async Task CancelModel()
@@ -543,7 +543,7 @@ namespace GBES.Pages.BoyFestival
             selectDetailTwo = "";
             selectDetailThree = "";
             selectDetailFour = "";
-            await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal-custom");
+            await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal1");
         }
 
         // 리스트에 세부종목 표시하기  (세부1, 세부2, ......)
@@ -776,7 +776,7 @@ namespace GBES.Pages.BoyFestival
                         isSelectTwo = true;
                         isSelectThree = true;
                         break;
-                    case "자전거":
+                    case "사이클":
                         isSelectTwo = true;
                         isSelectThree = true;
                         isSelectFour = true;
@@ -792,11 +792,12 @@ namespace GBES.Pages.BoyFestival
         // 참가신청 다운로드
         public void DownLoadPartyEntry()
         {
-            if (gName == null || gName == "종목선택")
-            {
-                JSRuntimeInjector.InvokeVoidAsync("alert", "종목별 출력입니다.\n종목을 먼저 출력하세요.");
-                return;
-            }
+            //if (gName == null || gName == "종목선택")
+            //{
+            //    JSRuntimeInjector.InvokeVoidAsync("alert", "종목별 출력입니다.\n종목을 먼저 출력하세요.");
+            //    return;
+            //}
+
             string excelFileName = "";
             string title = "";
 
@@ -812,7 +813,7 @@ namespace GBES.Pages.BoyFestival
                             .OrderBy(it => it.gName).ThenBy(it => it.sName)
                             .ToList();
                 excelFileName = cName;
-                if (gName != "종목선택")
+                if (gName is not null && gName != "종목선택")
                 {
                     title = gName;
                     excelPartyEntry = excelPartyEntry.Where(it => it.gName == gName).ToList();
@@ -824,6 +825,10 @@ namespace GBES.Pages.BoyFestival
                         excelPartyEntry = excelPartyEntry.Where(it => it.sName == sName).ToList();
                         excelFileName += "_" + sName;
                     }
+                }
+                else
+                {
+
                 }
 
                 title = title + "참가신청서";
@@ -865,7 +870,7 @@ namespace GBES.Pages.BoyFestival
                             .ToList();
                 excelFileName = memberName;
 
-                if (gName != "종목선택")
+                if (gName is not null && gName != "종목선택")
                 {
                     title = gName;
                     excelPartyEntry = excelPartyEntry.Where(it => it.gName == gName).ToList();
@@ -875,6 +880,10 @@ namespace GBES.Pages.BoyFestival
                         title += " " + sName + " ";
                         excelPartyEntry = excelPartyEntry.Where(it => it.sName == sName).ToList();
                     }
+                }
+                else
+                {
+
                 }
 
                 title = title + "참가신청서";

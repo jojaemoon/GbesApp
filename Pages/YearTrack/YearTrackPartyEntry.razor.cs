@@ -764,7 +764,7 @@ namespace GBES.Pages.YearTrack
                     StateHasChanged();
                 }
 
-                await JSRuntimeInjector.InvokeVoidAsync("closeModal", "");
+                await JSRuntimeInjector.InvokeVoidAsync("closeModal", ".modal1");
             }
         }
         public async Task CancelModel()
@@ -776,7 +776,7 @@ namespace GBES.Pages.YearTrack
             selectDetailTwo = "";
             selectDetailThree = "";
             selectDetailFour = "";
-            await JSRuntimeInjector.InvokeVoidAsync("closeModal", "modal-custom");
+            await JSRuntimeInjector.InvokeVoidAsync("closeModal", ".modal1");
         }
 
         // 리스트에 세부종목 표시하기  (세부1, 세부2, ......)

@@ -843,24 +843,25 @@ namespace GBES.Pages.BoyFestival
                 try
                 {
                     n++;
-                    birth = context.Z_PartyEntries
-                            .Where(it => it.partyName == partyName
-                                    && it.gName == item.gName
-                                    && it.sName == item.sName
-                                    && (it.dNameOne == item.dName || it.dNameTwo == item.dName
-                                         || it.dNameThree == item.dName || it.dNameFour == item.dName)
-                                    && it.name == item.name)
-                        .Select(it => it.jumin)
-                        .FirstOrDefault() == null ? "" :
-                        context.Z_PartyEntries
-                            .Where(it => it.partyName == partyName
-                                    && it.gName == item.gName
-                                    && it.sName == item.sName
-                                    && (it.dNameOne == item.dName || it.dNameTwo == item.dName
-                                         || it.dNameThree == item.dName || it.dNameFour == item.dName)
-                                    && it.name == item.name)
-                        .Select(it => it.jumin)
-                        .FirstOrDefault();
+                    var query = context.Z_PartyEntries
+                        .Where(it => it.partyName == partyName
+                                  && it.gName == item.gName
+                                  && it.sName == item.sName
+                                  && it.name == item.name);
+
+                    // 양궁이 아닐 때만 dName 조건 추가
+                    if (item.gName != "양궁" && item.gName !="체조")
+                    {
+                        query = query.Where(it =>
+                            it.dNameOne == item.dName ||
+                            it.dNameTwo == item.dName ||
+                            it.dNameThree == item.dName ||
+                            it.dNameFour == item.dName);
+                    }
+
+                    // 한 번만 실행
+                    birth = query.Select(it => it.jumin).FirstOrDefault() ?? "";
+
                     item.coach = birth;
                 }
                 catch (Exception e)
