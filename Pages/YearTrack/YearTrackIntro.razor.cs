@@ -136,20 +136,57 @@ namespace GBES.Pages.YearTrack
         // 참가신청요강 다운로드
         public async Task DownLoad()
         {
-            var fileName = year + " 학년별육상경기대회요강.pdf";
-
-            if (!string.IsNullOrEmpty(fileName))
+            var fileName = year + " 학년별육상경기대회요강.hwp";
+            if (string.IsNullOrEmpty(fileName))
             {
-                byte[] fileBytes = await FileStorageManagerReference.DownloadAsync(fileName, "");
-                if (fileBytes != null)
-                {
-                    await FileUtil.SaveAs(JSRuntimeInjector, fileName, fileBytes);
-                }
-                else
-                {
-                    await JSRuntimeInjector.InvokeVoidAsync("alert", "자료가 없습니다");
-                }
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "파일명이 없습니다");
+                return;
             }
+
+            var path = $"{env.WebRootPath}\\Upload\\{fileName}";
+
+            if (!System.IO.File.Exists(path))
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "자료가 없습니다");
+                return;
+            }
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(path, cancelation.Token);
+            await FileUtil.SaveAs(JSRuntimeInjector, fileName, fileBytes);
+        }
+        // 교육청 참고자료
+        public async Task DownLoadTwo()
+        {
+            var fileName = year + " 교육지원청 참고 자료.hwp";
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "파일명이 없습니다");
+                return;
+            }
+
+            var path = $"{env.WebRootPath}\\Upload\\{fileName}";
+
+            if (!System.IO.File.Exists(path))
+            {
+                await JSRuntimeInjector.InvokeVoidAsync("alert", "자료가 없습니다");
+                return;
+            }
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(path, cancelation.Token);
+            await FileUtil.SaveAs(JSRuntimeInjector, fileName, fileBytes);
+            //if (!string.IsNullOrEmpty(fileName))
+            //{
+            //    byte[] fileBytes = await FileStorageManagerReference.DownloadAsync(fileName, "");
+            //    if (fileBytes != null)
+            //    {
+            //        await FileUtil.SaveAs(JSRuntimeInjector, fileName, fileBytes);
+            //    }
+            //    else
+            //    {
+            //        await JSRuntimeInjector.InvokeVoidAsync("alert", "자료가 없습니다");
+            //    }
+            //}
         }
         #endregion
 

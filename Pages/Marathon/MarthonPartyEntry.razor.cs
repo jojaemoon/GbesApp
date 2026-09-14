@@ -43,7 +43,7 @@ namespace GBES.Pages.Marathon
         bool isDisabledCity = true;
         bool isDisabledSchool = true;
 
-        bool isEdit = false;
+        bool isEdit = true;
 
         List<string>? cNameList = new List<string>();
         List<string>? schoolNameList = new List<string>();
@@ -123,6 +123,15 @@ namespace GBES.Pages.Marathon
                                     .OrderBy(it => it.gName).ThenByDescending(it => it.sName).ThenBy(it => it.dNameOne)
                                     .ToList();
                     schoolNameList = appState.GetSchoolNamesBySection(cName, sName);
+
+                    string? partyentryEnd = context.Z_PartyNames
+                                    .Where(it => it.partyName == partyName)
+                                    .Select(it =>it.etc)
+                                    .FirstOrDefault();
+                    if (partyentryEnd != null && partyentryEnd == "마감")
+                    {
+                        isEdit = false;
+                    }
                 }
                 else if (memberPart == "경기단체")
                 {
@@ -251,6 +260,10 @@ namespace GBES.Pages.Marathon
             modalSelectSchool = "학교선택";
 
             isEdit = false;
+            if (memberPart == "교육지원청" || memberPart == "경북교육청" || memberPart == "관리자")
+            {
+                isEdit = true;
+            }
             await JSRuntimeInjector.InvokeVoidAsync("openModal", "modal-custom");
         }
 
@@ -642,6 +655,7 @@ namespace GBES.Pages.Marathon
                 worksheet.Column(6).Width = 20;
                 worksheet.Column(7).Width = 20;
                 worksheet.Column(8).Width = 20;
+                worksheet.Column(9).Width = 20;
                 worksheet.Cells[1, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                 worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
                 worksheet.Cells[1, 2].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -658,6 +672,8 @@ namespace GBES.Pages.Marathon
                 worksheet.Cells[1, 7].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
                 worksheet.Cells[1, 8].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                 worksheet.Cells[1, 8].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
+                worksheet.Cells[1, 9].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells[1, 9].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
 
                 var tableBody = worksheet.Cells["A1:A1"].LoadFromCollection(
                     (from m in excelPartyEntry
@@ -669,6 +685,7 @@ namespace GBES.Pages.Marathon
                          학교명 = m.schoolName,
                          성명 = m.name,
                          학년 = m.schoolYear,
+                         생년월일=m.jumin,
                          성별 = m.part,
                          비고 = m.dNameFive
                      })

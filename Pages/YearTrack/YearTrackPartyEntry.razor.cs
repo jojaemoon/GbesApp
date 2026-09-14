@@ -450,6 +450,12 @@ namespace GBES.Pages.YearTrack
             SetModalDetailSelect(modalSelectSection);
 
             isEdit = false;
+
+            selectDetailOne = "";
+            selectDetailTwo = "";
+            selectDetailThree = "";
+            selectDetailFour = "";
+
             await JSRuntimeInjector.InvokeVoidAsync("openModal", "modal-custom");
         }
 
@@ -1060,7 +1066,7 @@ namespace GBES.Pages.YearTrack
                             .OrderBy(it => it.city).ThenBy(it => it.gName).ThenBy(it => it.sName)
                             .ToList();
                 excelFileName = "학년별 육상경기대회";
-                title = year + " 2025 경상북도교육감배 초·중학년별 육상경기대회 참가신처현황";
+                title = year + " 경상북도교육감배 초·중학년별 육상경기대회 참가신청현황";
             }
             else if (memberPart == "학교")
             {

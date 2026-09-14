@@ -47,19 +47,42 @@
             throw new NotImplementedException();
         }
 
-        public async Task<string> UploadAsync(byte[] bytes, string fileName, string folderPath, bool overwrite)
+        public async Task<string> UploadAsync(
+    byte[] bytes,
+    string fileName,
+    string folderPath,
+    bool overwrite)
         {
-            await File.WriteAllBytesAsync(Path.Combine(_folderPath, folderPath, fileName), bytes);
+            var directoryPath = Path.Combine(_folderPath, folderPath);
+
+            Directory.CreateDirectory(directoryPath);
+
+            var filePath = Path.Combine(directoryPath, fileName);
+
+            await File.WriteAllBytesAsync(filePath, bytes);
 
             return fileName;
         }
 
-        public async Task<string> UploadAsync(Stream stream, string fileName, string folderPath, bool overwrite)
+        public async Task<string> UploadAsync(
+            Stream stream,
+            string fileName,
+            string folderPath,
+            bool overwrite)
         {
-            using (var fileStream = new FileStream(Path.Combine(_folderPath, folderPath, fileName), FileMode.Create))
-            {
-                await stream.CopyToAsync(fileStream);
-            }
+            var directoryPath = Path.Combine(_folderPath, folderPath);
+
+            Directory.CreateDirectory(directoryPath);
+
+            var filePath = Path.Combine(directoryPath, fileName);
+
+            using var fileStream = new FileStream(
+                filePath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None);
+
+            await stream.CopyToAsync(fileStream);
 
             return fileName;
         }

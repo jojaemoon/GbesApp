@@ -21,7 +21,7 @@ else
 {
     <div id="search">
         <div class="wrap">
-            <h2>2025 교육감배 시·군대항 초·중 구간마라톤대회 <span style="margin-left: 50px;" class="blue">@cName<span>교육지원청</span></span></h2>
+            <h2>2026 교육감배 시·군대항 초·중 구간마라톤대회 <span style="margin-left: 50px;" class="blue">@cName<span>교육지원청</span></span></h2>
             <div class="filter">
                 <div class="serach_icon"><img src="../imgs/sub/search_icon.png"></div>
                 <select value="@cName" @onchange="SelectCity" disabled="@isDisabledCity">
@@ -82,7 +82,8 @@ else
                                 else
                                 {
                                     <td>
-                                        <div class="type">
+                                        @item.schoolName
+                                        @* <div class="type">
                                             <div class="title"></div>
                                             <div class="data">
                                                 <select @bind="item.schoolName" class="ddlSchName">
@@ -93,7 +94,7 @@ else
                                                     }
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div> *@
                                     </td>
                                     <td>
                                         <input type="text" @bind="item.name" class="inputPlayerName" />
